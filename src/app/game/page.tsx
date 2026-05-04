@@ -2,18 +2,13 @@
 
 import { Card } from '@/components/ui/card'
 
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import {
-  Node,
   Edge,
-  NodeChange,
-  EdgeChange,
   Connection,
   useNodesState,
   useEdgesState,
   ReactFlow,
-  applyNodeChanges,
-  applyEdgeChanges,
   addEdge,
   Controls,
   Background,
