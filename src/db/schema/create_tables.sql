@@ -7,7 +7,13 @@ CREATE TYPE tipooperacion_auditoria AS ENUM ('INSERT', 'UPDATE', 'DELETE');
 CREATE TYPE tipo_perfil AS ENUM ('estudiante', 'profesor', 'administrador');
 
 -------------------------------------------------------------------
---                         TABLAS PRINCIPALES                     --
+--                         TABLAS PRINCIPALES                    --
+-------------------------------------------------------------------
+
+
+
+-------------------------------------------------------------------
+--                             19 TABLAS.                        --
 -------------------------------------------------------------------
 
 CREATE TABLE public.universidad (
@@ -154,7 +160,7 @@ CREATE TABLE public.ingresojuego (
 
 CREATE TABLE public.tipocomponente (
     pkid_tipocomponente INT NOT NULL,
-    nombre_tipocomponente VARCHAR(20) NOT NULL
+    nombre_tipocomponente VARCHAR(20) NOT NULL,
     fkidmodulo_tipocomponente INT NOT NULL
 );
 
