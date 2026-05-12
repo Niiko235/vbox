@@ -13,8 +13,7 @@ import {
 } from '@/components/ui/field'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-
-// import { login } from "@/features/auth/actions/login";
+import { login } from '../actions/login'
 
 const formSchema = z.object({
   email: z.string().min(1, {
@@ -50,16 +49,26 @@ export default function LoginForm({ onSwitch }: props) {
 
   async function onSubmit(values: FormValues) {
     setFormStatus({ status: 'loading' })
-    // const response = await login(values.email, values.password);
-    // if (!response.ok) {
-    //   setFormStatus({
-    //     status: "error",
-    //     error: response.error ?? "Error al iniciar sesión",
-    //   });
-    // } else {
-    //   setFormStatus({ status: "idle" });
-    //   router.push("/dashboard");
-    // }
+    const response = await login({
+      email: values.email,
+      password: values.password,
+    })
+    if (!response.ok) {
+      setFormStatus({
+        status: 'error',
+        error: response.error ?? 'Error al iniciar sesión',
+      })
+      return
+    }
+    setFormStatus({ status: 'idle' })
+    router.refresh()
+    if (response.data?.role === 'administrador') {
+      router.push('/inicio/')
+    } else if (response.data?.role === 'profesor') {
+      router.push('/home')
+    } else if (response.data?.role === 'estudiante') {
+      router.push('/dashboard')
+    }
   }
 
   return (
@@ -131,7 +140,10 @@ export default function LoginForm({ onSwitch }: props) {
 
       <p className="text-center text-sm mt-6 text-slate-400">
         ¿No tienes cuenta?{' '}
-        <button onClick={onSwitch} className="text-white font-bold underline hover:cursor-pointer">
+        <button
+          onClick={onSwitch}
+          className="text-white font-bold underline hover:cursor-pointer"
+        >
           Regístrate aquí
         </button>
       </p>
