@@ -10,12 +10,6 @@ CREATE TYPE tipo_perfil AS ENUM ('estudiante', 'profesor', 'administrador');
 --                         TABLAS PRINCIPALES                    --
 -------------------------------------------------------------------
 
-
-
--------------------------------------------------------------------
---                             19 TABLAS.                        --
--------------------------------------------------------------------
-
 CREATE TABLE public.universidad (
     pkcodigoies_universidad INT NOT NULL,
     nombre_universidad VARCHAR(20) NOT NULL,
