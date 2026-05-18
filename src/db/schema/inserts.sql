@@ -49,14 +49,23 @@ INSERT INTO public.curso (
 (2, 'Bases de Datos',  'Fundamentos de SQL y modelado relacional.',           'https://img.uni.edu/bd.png',       '2024-01-15 09:00:00', 1001),
 (3, 'Redes I',         'Conceptos basicos de redes y telecomunicaciones.',   'https://img.uni.edu/redes.png',    '2024-02-01 10:00:00', 1001);
  
+-- ============================================================
+-- 5. CURSO IMPARTIDO
+-- ============================================================
+
+INSERT INTO public.cursoimpartido (pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido) VALUES
+(1, 1002),
+(2, 1005),
+(3, 1002);
+
  
 -- ============================================================
--- 5. grupo
+-- 6. grupo
 -- ============================================================
  
 INSERT INTO public.grupo (
     pkid_grupo, fechacreacion_grupo, nombre_grupo,
-    descripcion_grupo, fkidprofesor_grupo, fkidcurso_grupo
+    descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
 ) VALUES
 (1, '2024-02-05 08:00:00', 'Grupo A',  'Grupo A de Python Basico semestre 2024-1.',   1002, 1),
 (2, '2024-02-05 08:30:00', 'Grupo B',  'Grupo B de Bases de Datos semestre 2024-1.',  1005, 2),
@@ -64,7 +73,7 @@ INSERT INTO public.grupo (
  
  
 -- ============================================================
--- 6. participación
+-- 7. participación
 -- ============================================================
  
 INSERT INTO public.participacion (
@@ -80,7 +89,7 @@ INSERT INTO public.participacion (
  
  
 -- ============================================================
--- 7. certificado
+-- 8. certificado
 -- ============================================================
  
 INSERT INTO public.certificado (
@@ -94,7 +103,7 @@ INSERT INTO public.certificado (
  
  
 -- ============================================================
--- 8. modulo
+-- 9. modulo
 -- ============================================================
  
 INSERT INTO public.modulo (pkid_modulo, numerorefuerzos_modulo, nombre_modulo, fkidcurso_modulo) VALUES
@@ -106,7 +115,7 @@ INSERT INTO public.modulo (pkid_modulo, numerorefuerzos_modulo, nombre_modulo, f
  
  
 -- ============================================================
--- 9. refuerzo
+-- 10. refuerzo
 -- ============================================================
  
 INSERT INTO public.refuerzo (
@@ -121,7 +130,7 @@ INSERT INTO public.refuerzo (
  
  
 -- ============================================================
--- 10. enlace
+-- 11. enlace
 -- ============================================================
  
 INSERT INTO public.enlace (
@@ -137,7 +146,7 @@ INSERT INTO public.enlace (
  
  
 -- ============================================================
--- 11. ingresorefuerzo
+-- 12. ingresorefuerzo
 -- ============================================================
  
 INSERT INTO public.ingresorefuerzo (
@@ -155,7 +164,7 @@ INSERT INTO public.ingresorefuerzo (
  
  
 -- ============================================================
--- 12. ingresoenlace
+-- 13. ingresoenlace
 -- ============================================================
  
 INSERT INTO public.ingresoenlace (
@@ -173,7 +182,7 @@ INSERT INTO public.ingresoenlace (
  
  
 -- ============================================================
--- 13. teoria
+-- 14. teoria
 -- ============================================================
  
 INSERT INTO public.teoria (
@@ -190,7 +199,7 @@ INSERT INTO public.teoria (
  
  
 -- ============================================================
--- 14. actividad
+-- 15. actividad
 -- ============================================================
  
 INSERT INTO public.actividad (
@@ -206,7 +215,7 @@ INSERT INTO public.actividad (
  
  
 -- ============================================================
--- 15. juego
+-- 16. juego
 -- ============================================================
  
 INSERT INTO public.juego (
@@ -220,7 +229,7 @@ INSERT INTO public.juego (
  
  
 -- ============================================================
--- 16. juegoelegido
+-- 17. juegoelegido
 -- ============================================================
  
 INSERT INTO public.juegoelegido (pfkidjuego_juegoelegido, pfkidgrupo_juegoelegido) VALUES
@@ -231,7 +240,7 @@ INSERT INTO public.juegoelegido (pfkidjuego_juegoelegido, pfkidgrupo_juegoelegid
  
  
 -- ============================================================
--- 17. ingresojuego
+-- 18. ingresojuego
 -- ============================================================
  
 INSERT INTO public.ingresojuego (
@@ -249,7 +258,7 @@ INSERT INTO public.ingresojuego (
  
  
 -- ============================================================
--- 18. tipocomponente
+-- 19. tipocomponente
 -- ============================================================
  
 INSERT INTO public.tipocomponente (pkid_tipocomponente, nombre_tipocomponente, fkidmodulo_tipocomponente) VALUES
@@ -261,7 +270,7 @@ INSERT INTO public.tipocomponente (pkid_tipocomponente, nombre_tipocomponente, f
  
  
 -- ============================================================
--- 19. componente
+-- 20. componente
 -- (Relacion recursiva: componentepadre_componente -> pkid_componente)
 -- Jerarquia:
 --   Nivel 1 (sin padre):  1, 4, 7

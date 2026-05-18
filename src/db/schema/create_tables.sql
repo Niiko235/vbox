@@ -50,9 +50,14 @@ CREATE TABLE public.grupo (
     fechacreacion_grupo TIMESTAMP NOT NULL DEFAULT NOW(),
     nombre_grupo VARCHAR(20) NOT NULL,
     descripcion_grupo VARCHAR(500) NOT NULL,
-    fkidprofesor_grupo BIGINT NOT NULL,
-    fkidcurso_grupo INT NOT NULL
+    fkidprofesorcursoimpartido_grupo BIGINT NOT NULL,
+    fkidcursocursoimpartido_grupo INT NOT NULL
 );
+
+CREATE TABLE public.cursoimpartido{
+    pfkidcurso_cursoimpartido INT NOT NULL,
+    pfkidprofesor_cursoimpartido BIGINT NOT NULL
+}
 
 CREATE TABLE public.participacion (
     pfkidestudiante_participacion BIGINT NOT NULL,

@@ -255,10 +255,67 @@ BEGIN
     RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-- ============================================================
+-- 5. auditoria.aud_cursoimpartido
+-- ============================================================
+
+--insert 
+CREATE OR REPLACE FUNCTION func_cursoimpartido_insert() RETURNS TRIGGER
+AS $$
+BEGIN
+    INSERT INTO auditoria.aud_cursoimpartido (
+        fecha_aud, usuario_aud, operacion_aud,
+        pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido
+    ) VALUES (
+        CURRENT_TIMESTAMP, CURRENT_USER, 'INSERT',
+        NEW.pfkidcurso_cursoimpartido, NEW.pfkidprofesor_cursoimpartido
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+ 
+--update new y old
+CREATE OR REPLACE FUNCTION func_cursoimpartido_update() RETURNS TRIGGER
+AS $$
+BEGIN
+    INSERT INTO auditoria.aud_cursoimpartido (
+        fecha_aud, usuario_aud, operacion_aud,
+        pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido
+    ) VALUES (
+        CURRENT_TIMESTAMP, CURRENT_USER, 'UPDATE',
+        NEW.pfkidcurso_cursoimpartido, NEW.pfkidprofesor_cursoimpartido
+    );
+    INSERT INTO auditoria.aud_cursoimpartido (
+        fecha_aud, usuario_aud, operacion_aud,
+        pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido
+    ) VALUES (
+        CURRENT_TIMESTAMP, CURRENT_USER, 'UPDATE',
+        OLD.pfkidcurso_cursoimpartido, OLD.pfkidprofesor_cursoimpartido
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+ 
+--delete
+CREATE OR REPLACE FUNCTION func_cursoimpartido_delete() RETURNS TRIGGER
+AS $$
+BEGIN
+    INSERT INTO auditoria.aud_cursoimpartido (
+        fecha_aud, usuario_aud, operacion_aud,
+        pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido
+    ) VALUES (
+        CURRENT_TIMESTAMP, CURRENT_USER, 'DELETE',
+        OLD.pfkidcurso_cursoimpartido, OLD.pfkidprofesor_cursoimpartido
+    );
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 5. auditoria.aud_grupo
+-- 6. auditoria.aud_grupo
 -- ============================================================
 
 --insert 
@@ -268,11 +325,11 @@ BEGIN
     INSERT INTO auditoria.aud_grupo (
         fecha_aud, usuario_aud, operacion_aud,
         pkid_grupo, fechacreacion_grupo, nombre_grupo,
-        descripcion_grupo, fkidprofesor_grupo, fkidcurso_grupo
+        descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
     ) VALUES (
         CURRENT_TIMESTAMP, CURRENT_USER, 'INSERT',
         NEW.pkid_grupo, NEW.fechacreacion_grupo, NEW.nombre_grupo,
-        NEW.descripcion_grupo, NEW.fkidprofesor_grupo, NEW.fkidcurso_grupo
+        NEW.descripcion_grupo, NEW.fkidprofesorcursoimpartido_grupo, NEW.fkidcursocursoimpartido_grupo
     );
     RETURN NEW;
 END;
@@ -285,20 +342,20 @@ BEGIN
     INSERT INTO auditoria.aud_grupo (
         fecha_aud, usuario_aud, operacion_aud,
         pkid_grupo, fechacreacion_grupo, nombre_grupo,
-        descripcion_grupo, fkidprofesor_grupo, fkidcurso_grupo
+        descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
     ) VALUES (
         CURRENT_TIMESTAMP, CURRENT_USER, 'UPDATE',
         NEW.pkid_grupo, NEW.fechacreacion_grupo, NEW.nombre_grupo,
-        NEW.descripcion_grupo, NEW.fkidprofesor_grupo, NEW.fkidcurso_grupo
+        NEW.descripcion_grupo, NEW.fkidprofesorcursoimpartido_grupo, NEW.fkidcursocursoimpartido_grupo
     );
     INSERT INTO auditoria.aud_grupo (
         fecha_aud, usuario_aud, operacion_aud,
         pkid_grupo, fechacreacion_grupo, nombre_grupo,
-        descripcion_grupo, fkidprofesor_grupo, fkidcurso_grupo
+        descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
     ) VALUES (
         CURRENT_TIMESTAMP, CURRENT_USER, 'UPDATE',
         OLD.pkid_grupo, OLD.fechacreacion_grupo, OLD.nombre_grupo,
-        OLD.descripcion_grupo, OLD.fkidprofesor_grupo, OLD.fkidcurso_grupo
+        OLD.descripcion_grupo, OLD.fkidprofesorcursoimpartido_grupo, OLD.fkidcursocursoimpartido_grupo
     );
     RETURN NEW;
 END;
@@ -311,11 +368,11 @@ BEGIN
     INSERT INTO auditoria.aud_grupo (
         fecha_aud, usuario_aud, operacion_aud,
         pkid_grupo, fechacreacion_grupo, nombre_grupo,
-        descripcion_grupo, fkidprofesor_grupo, fkidcurso_grupo
+        descripcion_grupo, fkidprofesor_grupocursoimpartido, fkidcursocursoimpartido_grupo
     ) VALUES (
         CURRENT_TIMESTAMP, CURRENT_USER, 'DELETE',
         OLD.pkid_grupo, OLD.fechacreacion_grupo, OLD.nombre_grupo,
-        OLD.descripcion_grupo, OLD.fkidprofesor_grupo, OLD.fkidcurso_grupo
+        OLD.descripcion_grupo, OLD.fkidprofesorcursoimpartido_grupo, OLD.fkidcursocursoimpartido_grupo
     );
     RETURN OLD;
 END;
@@ -323,7 +380,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 6. auditoria.aud_participacion
+-- 7. auditoria.aud_participacion
 -- ============================================================
 
 --insert
@@ -404,7 +461,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 7. auditoria.aud_certificado
+-- 8. auditoria.aud_certificado
 -- ============================================================
 
 --insert 
@@ -477,7 +534,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 8. auditoria.aud_refuerzo
+-- 9. auditoria.aud_refuerzo
 -- ============================================================
 
 --insert
@@ -542,7 +599,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 9. auditoria.aud_enlace
+-- 10. auditoria.aud_enlace
 -- ============================================================
 
 --insert
@@ -607,7 +664,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 10. auditoria.aud_ingresorefuerzo
+-- 11. auditoria.aud_ingresorefuerzo
 -- ============================================================
 
 --insert
@@ -696,7 +753,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 11. auditoria.aud_ingresoenlace
+-- 12. auditoria.aud_ingresoenlace
 -- ============================================================
 
 --insert
@@ -785,7 +842,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 12. auditoria.aud_modulo
+-- 13. auditoria.aud_modulo
 -- ============================================================
 
 --insert
@@ -842,7 +899,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 13. auditoria.aud_teoria
+-- 14. auditoria.aud_teoria
 -- ============================================================
 
 --insert
@@ -907,7 +964,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 14. auditoria.aud_actividad
+-- 15. auditoria.aud_actividad
 -- ============================================================
 
 --insert 
@@ -972,7 +1029,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 15. auditoria.aud_juego
+-- 16. auditoria.aud_juego
 -- ============================================================
 
 --insert 
@@ -1037,7 +1094,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 16. auditoria.aud_juegoelegido
+-- 17. auditoria.aud_juegoelegido
 -- ============================================================
 
 --insert
@@ -1094,7 +1151,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 17. auditoria.aud_ingresojuego
+-- 18. auditoria.aud_ingresojuego
 -- ============================================================
 
 --insert
@@ -1191,7 +1248,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 18. auditoria.aud_tipocomponente
+-- 19. auditoria.aud_tipocomponente
 -- ============================================================
 
 --insert
@@ -1248,7 +1305,7 @@ $$ LANGUAGE plpgsql;
  
  
 -- ============================================================
--- 19. auditoria.aud_componente
+-- 20. auditoria.aud_componente
 -- ============================================================
 
 --insert
