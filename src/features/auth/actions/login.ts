@@ -11,9 +11,9 @@ type props = {
 }
 
 type perfil = {
-  PrimerNombre: string
-  USUARIO: string
-  ROL: tipo_rol
+  primernombre: string
+  usuario: string
+  rol: tipo_rol
 }
 
 const secretKey = process.env.JWT_SECRET
@@ -32,11 +32,13 @@ export async function login({ email, password }: props) {
 
     const user = rows[0]
 
+    console.log('DB row:', rows[0])
+
     const token = jwt.sign(
       {
-        email: user.USUARIO,
-        name: user.PrimerNombre,
-        role: user.ROL,
+        email: user.usuario,
+        name: user.primernombre,
+        role: user.rol,
       },
       secretKey as string
     )
@@ -50,9 +52,9 @@ export async function login({ email, password }: props) {
     return {
       ok: true,
       data: {
-        email: user.USUARIO,
-        name: user.PrimerNombre,
-        role: user.ROL,
+        email: user.usuario,
+        name: user.primernombre,
+        role: user.rol,
       },
     }
   } catch {

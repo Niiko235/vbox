@@ -13,8 +13,8 @@ export function AuthCardDesktop() {
   const [isLogin, setIsLogin] = useState(true)
 
   return (
-    <Card className="overflow-hidden border-0 shadow-xl p-0 w-full max-w-4xl">
-      <CardContent className="relative grid grid-cols-2 gap-0 p-0 min-h-170">
+    <Card className="overflow-hidden border-0 shadow-xl p-0 w-full max-w-5xl">
+      <CardContent className="relative grid grid-cols-2 gap-0 p-0 min-h-150">
         {/* Panel branding — se mueve de izquierda a derecha */}
         <motion.section
           className="flex flex-col items-center justify-center bg-white px-12 py-16 absolute inset-y-0 w-1/2"
@@ -66,8 +66,8 @@ export function AuthCardDesktop() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="mb-8">
-                  <h2 className="text-4xl font-bold">Registrarse</h2>
+                <div className="mb-4">
+                  <h2 className="text-3xl font-bold">Registrarse</h2>
                   <p className="text-slate-400 mt-1">
                     Crea tu cuenta para acceder a la plataforma
                   </p>

@@ -105,7 +105,7 @@ export default function RegisterForm({ onSwitch }: props) {
   return (
     <>
       <form id="form-register" onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup>
+        <FieldGroup className=''>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Controller
               name="nombres"
@@ -124,9 +124,9 @@ export default function RegisterForm({ onSwitch }: props) {
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {fieldState.invalid && (
+                  {/* {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
-                  )}
+                  )} */}
                 </Field>
               )}
             />
@@ -148,12 +148,61 @@ export default function RegisterForm({ onSwitch }: props) {
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {fieldState.invalid && (
+                  {/* {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
-                  )}
+                  )} */}
                 </Field>
               )}
             />
+            <Controller
+              name="nombres"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-register-nombres">
+                    Nombres *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-register-nombres"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Fernando"
+                    autoComplete="off"
+                    disabled={formStatus.status === 'loading'}
+                    className="bg-gray-800 border-gray-500"
+                  />
+                  {/* {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )} */}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="apellidos"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-register-apellidos">
+                    Apellidos *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-register-apellidos"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Valderrama"
+                    autoComplete="off"
+                    disabled={formStatus.status === 'loading'}
+                    className="bg-gray-800 border-gray-500"
+                  />
+                  {/* {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )} */}
+                </Field>
+              )}
+            />
+          </div>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             <Controller
               name="cedula"
               control={form.control}
@@ -172,9 +221,9 @@ export default function RegisterForm({ onSwitch }: props) {
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {fieldState.invalid && (
+                  {/* {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
-                  )}
+                  )} */}
                 </Field>
               )}
             />
@@ -184,7 +233,7 @@ export default function RegisterForm({ onSwitch }: props) {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="form-register-numero-telefono">
-                    Número de teléfono *
+                    Número teléfono *
                   </FieldLabel>
                   <Input
                     {...field}
@@ -196,39 +245,19 @@ export default function RegisterForm({ onSwitch }: props) {
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {fieldState.invalid && (
+                  {/* {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
-                  )}
+                  )} */}
                 </Field>
               )}
             />
-          </div>
-          <Controller
-            name="universidad"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Universidad *</FieldLabel>
-                <SelectedUni
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={formStatus.status === 'loading'}
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Input de la fecha nacimiento */}
             <Controller
               name="fechaNacimiento"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="form-register-fecha-nacimiento">
-                    Fecha de Nacimiento *
+                    Fecha Nacimiento *
                   </FieldLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -240,7 +269,7 @@ export default function RegisterForm({ onSwitch }: props) {
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value
                           ? new Date(field.value).toLocaleDateString()
-                          : 'Selecciona una fecha'}
+                          : 'dd/mm/yyyy'}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -255,29 +284,51 @@ export default function RegisterForm({ onSwitch }: props) {
                       />
                     </PopoverContent>
                   </Popover>
-                  {fieldState.error && (
+                  {/* {fieldState.error && (
                     <FieldError errors={[fieldState.error]} />
-                  )}
+                  )} */}
                 </Field>
               )}
             />
-            <Controller
-              name="programa"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Programa *</FieldLabel>
-                  <SelectedProgram
-                    value={field.value}
-                    onChange={field.onChange}
-                    disabled={formStatus.status === 'loading'}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Controller
+            name="universidad"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Universidad *</FieldLabel>
+                <SelectedUni
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={formStatus.status === 'loading'}
+                />
+                {/* {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )} */}
+              </Field>
+            )}
+          />
+          {/* Input de la fecha nacimiento */}
+
+          <Controller
+            name="programa"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Programa *</FieldLabel>
+                <SelectedProgram
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={formStatus.status === 'loading'}
+                />
+                {/* {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )} */}
+              </Field>
+            )}
+          />
           </div>
           <Controller
             name="email"
@@ -296,36 +347,60 @@ export default function RegisterForm({ onSwitch }: props) {
                   disabled={formStatus.status === 'loading'}
                   className="bg-gray-800 border-gray-500"
                 />
-                {fieldState.invalid && (
+                {/* {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
-                )}
+                )} */}
               </Field>
             )}
           />
-          <Controller
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Controller
             name="password"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="form-register-password">
-                  Contraseña
+                  Contraseña*
                 </FieldLabel>
                 <Input
                   {...field}
                   id="form-register-password"
-                  placeholder="••••••••"
-                  type="password"
+                  placeholder="est123"
                   aria-invalid={fieldState.invalid}
                   autoComplete="off"
                   disabled={formStatus.status === 'loading'}
                   className="bg-gray-800 border-gray-500"
                 />
-                {fieldState.invalid && (
+                {/* {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
-                )}
+                )} */}
               </Field>
             )}
           />
+            <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="form-register-password">
+                  Confirmar Contraseña *
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id="form-register-password"
+                  placeholder="est123"
+                  aria-invalid={fieldState.invalid}
+                  autoComplete="off"
+                  disabled={formStatus.status === 'loading'}
+                  className="bg-gray-800 border-gray-500"
+                />
+                {/* {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )} */}
+              </Field>
+            )}
+          />
+          </div>
         </FieldGroup>
 
         {formStatus.status === 'error' && (
@@ -342,7 +417,7 @@ export default function RegisterForm({ onSwitch }: props) {
         </Button>
       </form>
 
-      <p className="text-center text-sm mt-6 text-slate-400">
+      <p className="text-center text-sm mt-2 text-slate-400">
         ¿Ya tienes cuenta?{' '}
         <button
           onClick={onSwitch}

@@ -1,4 +1,5 @@
-// import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
+import { getSesion } from '@/features/auth/actions/get-sesion';
 import type { Metadata } from 'next'
 const APP_NAME = 'VBox'
 
@@ -14,14 +15,26 @@ export default async function HomeLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // const userRole = await getUserRole();
+  const userRole = await getSesion();
 
-  // if (userRole === "teacher") {
-  //   redirect("/dashboard");
-  // }
-  // if (userRole === "student") {
-  //   redirect("/dashboard");
-  // }
+  if (!userRole.sesion) {
+    return (
+      <>
+        <div>
+          <h1 className="text-2xl font-bold text-center mt-10">
+            No has iniciado sesión
+          </h1>
+        </div>
+      </>
+    )
+  }
+
+  if (userRole.sesion.role === "profesor") {
+    redirect("/home");
+  }
+  if (userRole.sesion.role === "estudiante") {
+    redirect("/dashboard");
+  }
 
   return <>{children}</>
 }
