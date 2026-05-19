@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, Trash2, Plus, FileText } from 'lucide-react'
+import { Pencil, Plus, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { Profesor } from '../actions/get-all-profesores'
+import { AlertDialogDeleteTeacher } from './alert-dialog-delete-teacher'
 
 type Props = {
   initialProfesores: Profesor[]
@@ -107,15 +108,11 @@ export function ListProfesores({ initialProfesores }: Props) {
                       >
                         <Pencil size={18} />
                       </Button>
-                      {/* AlertDialog de eliminar — por implementar */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleEliminar(profesor.pkcc)}
-                      >
-                        <Trash2 size={18} />
-                      </Button>
+                      <AlertDialogDeleteTeacher
+                        cedula={profesor.pkcc}
+                        nombreProfesor={`${profesor.primernombre} ${profesor.primerapellido}`}
+                        handleEliminar={handleEliminar}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
