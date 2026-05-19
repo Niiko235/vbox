@@ -4,16 +4,12 @@ CREATE OR REPLACE FUNCTION eliminar_profesor(
 )
 RETURNS BOOLEAN
 AS $$
-DECLARE
-    filas_afectadas INT;
 BEGIN
     --eliminar
     DELETE FROM perfil
     WHERE pkcc_perfil = cedula AND rol = 'profesor';
-    
-    GET DIAGNOSTICS filas_afectadas = ROW_COUNT;
 
-    RETURN filas_afectadas > 0;
+    RETURN FOUND;
 END;
 $$ LANGUAGE plpgsql;
 

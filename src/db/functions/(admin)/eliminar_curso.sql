@@ -1,19 +1,35 @@
 --eliminar un curso registrado en el sistema
+-- CREATE OR REPLACE FUNCTION eliminar_curso(
+--     id INT
+-- )
+-- RETURNS BOOLEAN
+-- AS $$ 
+-- DECLARE
+--     filas_afectadas INT;
+-- BEGIN
+--     --eliminar
+--     DELETE FROM curso
+--     WHERE pkid_curso = id; 
+    
+--     GET DIAGNOSTICS filas_afectadas = ROW_COUNT;
+
+--     RETURN filas_afectadas > 0;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION eliminar_curso(
     id INT
 )
 RETURNS BOOLEAN
 AS $$ 
-DECLARE
-    filas_afectadas INT;
 BEGIN
     --eliminar
     DELETE FROM curso
     WHERE pkid_curso = id; 
     
-    GET DIAGNOSTICS filas_afectadas = ROW_COUNT;
 
-    RETURN filas_afectadas > 0;
+    RETURN FOUND;
 END;
 $$ LANGUAGE plpgsql;
 

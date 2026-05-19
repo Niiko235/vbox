@@ -2,18 +2,19 @@
 CREATE OR REPLACE FUNCTION consultar_curso()
 RETURNS TABLE (
     id            INT,
-    nombre          VARCHAR,
-    fechacreacion   TIMESTAMP
-
+    nombre        VARCHAR,
+    descripcion   VARCHAR,
+    fechacreacion TIMESTAMP
 )
 AS $$
 BEGIN
 	RETURN QUERY
 	--consulta
-	SELECT 
-        public.curso.pkid_curso as id, 
+	SELECT
+        public.curso.pkid_curso as id,
         public.curso.nombre_curso as nombre,
-        public.curso.fechacreacion_curso as fechacreacion 
+        public.curso.descripcion_curso as descripcion,
+        public.curso.fechacreacion_curso as fechacreacion
     FROM public.curso;
 END;
 $$
