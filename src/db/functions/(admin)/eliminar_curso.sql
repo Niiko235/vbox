@@ -1,15 +1,15 @@
---eliminar un profesor registrado en el sistema
-CREATE OR REPLACE FUNCTION eliminar_profesor(
-    cedula BIGINT
+--eliminar un curso registrado en el sistema
+CREATE OR REPLACE FUNCTION eliminar_curso(
+    id INT
 )
 RETURNS BOOLEAN
-AS $$
+AS $$ 
 DECLARE
     filas_afectadas INT;
 BEGIN
     --eliminar
-    DELETE FROM perfil
-    WHERE pkcc_perfil = cedula AND rol = 'profesor';
+    DELETE FROM curso
+    WHERE pkid_curso = id; 
     
     GET DIAGNOSTICS filas_afectadas = ROW_COUNT;
 
@@ -21,4 +21,4 @@ $$ LANGUAGE plpgsql;
 -- esta funcion se puede mejorar, que cuando no se hayan encontrados registros eliminados, se pueda mostrar un mensaje indicando que no se encontró el profesor con la cédula proporcionada. Esto se puede lograr utilizando RAISE NOTICE o RAISE EXCEPTION para proporcionar retroalimentación al usuario.
 
 --ejecutar
-CALL eliminar_profesor(123456789);
+CALL eliminar_profesor(1000);

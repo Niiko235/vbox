@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, FileText } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { FileText } from 'lucide-react'
 import type { Curso } from '../actions/get-all-courses'
 import { CardCourse } from './card-course'
+import { DialogCreateCourseForm } from './dialog-create-course-form'
 
 type Props = {
   initialCursos: Curso[]
@@ -30,20 +30,7 @@ export function ListCourses({ initialCursos }: Props) {
         </p>
       </div>
 
-      {/* Dialog de crear — por implementar */}
-      <Button
-        className="bg-[#3d1f8c] hover:bg-[#2e1769] text-white"
-        onClick={() =>
-          handleCrear({
-            id: Date.now(),
-            nombre: 'Nuevo Curso',
-            fechacreacion: new Date().toISOString(),
-          })
-        }
-      >
-        <Plus size={16} />
-        Crear Curso
-      </Button>
+      <DialogCreateCourseForm handleCrear={handleCrear} />
 
       {cursos.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-muted-foreground gap-3">

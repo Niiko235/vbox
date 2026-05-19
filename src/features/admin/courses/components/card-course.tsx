@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Pencil, Trash2, BookOpen } from 'lucide-react'
+import { Pencil, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import type { Curso } from '../actions/get-all-courses'
+import { AlertDialogDeleteCourse } from './alert-dialog-delete-course'
 
 type Props = {
   curso: Curso
@@ -52,15 +53,11 @@ export function CardCourse({ curso, onEliminar }: Props) {
         >
           <Pencil size={18} />
         </Button>
-        {/* AlertDialog de eliminar — por implementar */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-          onClick={() => onEliminar(curso.id)}
-        >
-          <Trash2 size={18} />
-        </Button>
+        <AlertDialogDeleteCourse
+          id={curso.id}
+          nombreCurso={curso.nombre}
+          handleEliminar={onEliminar}
+        />
       </CardFooter>
     </Card>
   )

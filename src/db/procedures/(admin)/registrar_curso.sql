@@ -4,7 +4,7 @@ CREATE OR REPLACE PROCEDURE registrar_curso(
 	IN codigocurso INT,
     IN descripcion VARCHAR,
     IN nombrecurso VARCHAR,
-    IN fechacreacion TIMESTAMP,
+    IN administrador BIGINT,
     IN imagen TEXT
 )
 LANGUAGE plpgsql
@@ -12,22 +12,22 @@ AS $$
 BEGIN
 	--insertar
 	INSERT INTO curso (
-		pkid_curso,
+			pkid_curso,
     		descripcion_curso,
     		nombre_curso,
-    		fechacreacion_curso,
+    		pfkidadministrador_curso,
     		imagen_curso
 	) VALUES (
-		codigocurso, descripcion, nombrecurso, fechacreacion, imagen
+		codigocurso, descripcion, nombrecurso, administrador, imagen
 	);
 END;
 $$;
 
 --ejecutar
 CALL registrar_curso(
-	101,
+	10001,
 	'Curso de Programación en Python',
 	'Programación en Python',
-	'2024-01-15',
+	1001,
 	'url_de_imagen.jpg'
 );

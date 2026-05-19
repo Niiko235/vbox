@@ -8,7 +8,8 @@ import { tipo_rol } from '@/types/db'
 type sesion = {
   name: string,
   email: string,
-  role: tipo_rol
+  role: tipo_rol,
+  cedula: string,
 }
 
 export async function getSesion() {
@@ -31,7 +32,8 @@ export async function getSesion() {
     const sesion : sesion = {
       name: token.name,
       email: token.email,
-      role: token.role
+      role: token.role,
+      cedula: token.cedula,
     }
 
     return {
