@@ -43,7 +43,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
     }
   }
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
