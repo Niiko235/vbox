@@ -62,7 +62,5 @@ export async function login({ email, password }: props) {
       ok: false,
       error: 'Error al iniciar sesión',
     }
-  } finally {
-    await postgres.end()
   }
 }
