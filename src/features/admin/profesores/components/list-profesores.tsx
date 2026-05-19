@@ -49,6 +49,7 @@ export function ListProfesores({ initialProfesores }: Props) {
               primernombre: 'Nuevo',
               primerapellido: 'Profesor',
               email: 'nuevo@test.com',
+              rol: 'profesor',
             })
           }
         >

@@ -1,17 +1,19 @@
 --traer los cursos registrados en el sistema
 CREATE OR REPLACE FUNCTION consultar_curso()
 RETURNS TABLE (
-    Nombre VARCHAR,
-    Id INT,
-    FechaCreacion TIMESTAMP
+    id            INT,
+    nombre          VARCHAR,
+    fechacreacion   TIMESTAMP
+
 )
 AS $$
 BEGIN
 	RETURN QUERY
 	--consulta
-	SELECT public.curso.nombre_curso as Nombre,
-        public.curso.pkid_curso as Id, 
-        public.curso.fechacreacion_curso as FechaCreacion 
+	SELECT 
+        public.curso.pkid_curso as id, 
+        public.curso.nombre_curso as nombre,
+        public.curso.fechacreacion_curso as fechacreacion 
     FROM public.curso;
 END;
 $$

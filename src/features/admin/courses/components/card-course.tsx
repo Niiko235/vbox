@@ -29,7 +29,7 @@ export function CardCourse({ curso, onEliminar }: Props) {
 
       <CardContent className="space-y-1 text-sm">
         <p>
-          <span className="font-semibold">ID:</span> {curso.pkid}
+          <span className="font-semibold">ID:</span> {curso.id}
         </p>
         <p>
           <span className="font-semibold">Fecha de creación:</span>{' '}
@@ -42,7 +42,7 @@ export function CardCourse({ curso, onEliminar }: Props) {
           asChild
           className="flex-1 bg-[#3d1f8c] hover:bg-[#2e1769] text-white font-semibold"
         >
-          <Link href={`/inicio/cursos/${curso.pkid}`}>Ver detalles</Link>
+          <Link href={`/inicio/cursos/${curso.id}`}>Ver detalles</Link>
         </Button>
         {/* Dialog de editar — por implementar */}
         <Button
@@ -57,7 +57,7 @@ export function CardCourse({ curso, onEliminar }: Props) {
           variant="ghost"
           size="icon"
           className="text-red-500 hover:text-red-700 hover:bg-red-50"
-          onClick={() => onEliminar(curso.pkid)}
+          onClick={() => onEliminar(curso.id)}
         >
           <Trash2 size={18} />
         </Button>

@@ -18,7 +18,7 @@ export function ListCourses({ initialCursos }: Props) {
   }
 
   const handleEliminar = (pkid: number) => {
-    setCursos((prev) => prev.filter((c) => c.pkid !== pkid))
+    setCursos((prev) => prev.filter((c) => c.id !== pkid))
   }
 
   return (
@@ -35,7 +35,7 @@ export function ListCourses({ initialCursos }: Props) {
         className="bg-[#3d1f8c] hover:bg-[#2e1769] text-white"
         onClick={() =>
           handleCrear({
-            pkid: Date.now(),
+            id: Date.now(),
             nombre: 'Nuevo Curso',
             fechacreacion: new Date().toISOString(),
           })
@@ -54,7 +54,7 @@ export function ListCourses({ initialCursos }: Props) {
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {cursos.map((curso) => (
-            <CardCourse key={curso.pkid} curso={curso} onEliminar={handleEliminar} />
+            <CardCourse key={curso.id} curso={curso} onEliminar={handleEliminar} />
           ))}
         </div>
       )}
