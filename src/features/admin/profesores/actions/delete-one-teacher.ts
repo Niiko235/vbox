@@ -7,20 +7,21 @@ type DeleteTeacherResponse = {
   message?: string
 }
 
-export async function deleteOneTeacher(cedula: string): Promise<DeleteTeacherResponse> {
+export async function deleteOneTeacher(
+  cedula: string
+): Promise<DeleteTeacherResponse> {
   try {
-    const { rows } = await db.query<{ eliminar_profesor: string }>(
+    const { rows } = await db.query<{ eliminar_profesor: boolean }>(
       'SELECT eliminar_profesor($1)',
       [BigInt(cedula)]
     )
 
     const result = rows[0].eliminar_profesor
 
-    if (result !== 'OK') {
-      return { ok: false, message: result }
+    return{
+      ok: result,
     }
 
-    return { ok: true }
   } catch {
     return { ok: false, message: 'Error inesperado al eliminar el profesor' }
   }

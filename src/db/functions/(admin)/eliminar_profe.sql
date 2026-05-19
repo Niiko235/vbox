@@ -17,5 +17,8 @@ BEGIN
 END;
 $$;
 
+
+-- esta funcion se puede mejorar, que cuando no se hayan encontrados registros eliminados, se pueda mostrar un mensaje indicando que no se encontró el profesor con la cédula proporcionada. Esto se puede lograr utilizando RAISE NOTICE o RAISE EXCEPTION para proporcionar retroalimentación al usuario.
+
 --ejecutar
 CALL eliminar_profesor(123456789);
