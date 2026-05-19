@@ -5,6 +5,7 @@ import { db } from '@/db/connnection'
 export type Curso = {
   id: number
   nombre: string
+  descripcion: string
   fechacreacion: string
 }
 

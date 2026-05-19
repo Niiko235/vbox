@@ -21,6 +21,10 @@ export function ListCourses({ initialCursos }: Props) {
     setCursos((prev) => prev.filter((c) => c.id !== pkid))
   }
 
+  const handleEditar = (cursoActualizado: Curso) => {
+    setCursos((prev) => prev.map((c) => c.id === cursoActualizado.id ? cursoActualizado : c))
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -41,7 +45,7 @@ export function ListCourses({ initialCursos }: Props) {
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {cursos.map((curso) => (
-            <CardCourse key={curso.id} curso={curso} onEliminar={handleEliminar} />
+            <CardCourse key={curso.id} curso={curso} onEliminar={handleEliminar} onEditar={handleEditar} />
           ))}
         </div>
       )}

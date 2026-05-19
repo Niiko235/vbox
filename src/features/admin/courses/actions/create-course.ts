@@ -43,6 +43,7 @@ export async function createCourse(input: CreateCourseInput): Promise<CreateCour
       data: {
         id: input.id,
         nombre: input.nombre,
+        descripcion: input.descripcion,
         fechacreacion: new Date().toISOString(),
       },
     }

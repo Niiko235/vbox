@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Pencil, BookOpen } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -12,13 +12,15 @@ import {
 } from '@/components/ui/card'
 import type { Curso } from '../actions/get-all-courses'
 import { AlertDialogDeleteCourse } from './alert-dialog-delete-course'
+import { DialogEditCourseForm } from './dialog-edit-course-form'
 
 type Props = {
   curso: Curso
   onEliminar: (pkid: number) => void
+  onEditar: (cursoActualizado: Curso) => void
 }
 
-export function CardCourse({ curso, onEliminar }: Props) {
+export function CardCourse({ curso, onEliminar, onEditar }: Props) {
   return (
     <Card>
       <CardHeader>
@@ -36,6 +38,7 @@ export function CardCourse({ curso, onEliminar }: Props) {
           <span className="font-semibold">Fecha de creación:</span>{' '}
           {new Date(curso.fechacreacion).toLocaleDateString('es-CO')}
         </p>
+        {/* <p className="text-muted-foreground">{curso.descripcion}</p> */}
       </CardContent>
 
       <CardFooter className="flex items-center gap-2 bg-transparent border-t-0">
@@ -45,14 +48,7 @@ export function CardCourse({ curso, onEliminar }: Props) {
         >
           <Link href={`/inicio/cursos/${curso.id}`}>Ver detalles</Link>
         </Button>
-        {/* Dialog de editar — por implementar */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-        >
-          <Pencil size={18} />
-        </Button>
+        <DialogEditCourseForm curso={curso} handleEditar={onEditar} />
         <AlertDialogDeleteCourse
           id={curso.id}
           nombreCurso={curso.nombre}
