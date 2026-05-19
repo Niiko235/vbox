@@ -1,0 +1,1 @@
+export type tipo_rol = 'administrador' | 'profesor' | 'estudiante'

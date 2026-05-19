@@ -36,16 +36,7 @@ export async function middleware(request: NextRequest) {
     }
   } else if (requestedPath === '/') {
     if (validatedToken) {
-      if (true) {
-        // si es admin
-        return NextResponse.redirect(new URL(`/inicio`, request.url))
-      } else if (true) {
-        // si es profesor
-        return NextResponse.redirect(new URL(`/home`, request.url))
-      } else {
-        // si es estudiante
-        return NextResponse.redirect(new URL(`/dashboard`, request.url))
-      }
+      return NextResponse.redirect(new URL(`/dashboard`, request.url))
     }
   }
 

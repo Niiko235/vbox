@@ -11,6 +11,8 @@ ALTER TABLE public.curso ADD CONSTRAINT pk_curso PRIMARY KEY (pkid_curso);
 
 ALTER TABLE public.grupo ADD CONSTRAINT pk_grupo PRIMARY KEY (pkid_grupo);
 
+ALTER TABLE public.cursoimpartido ADD CONSTRAINT pk_cursoimpartido PRIMARY KEY (pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido);
+
 ALTER TABLE public.participacion ADD CONSTRAINT pk_participacion PRIMARY KEY (pfkidestudiante_participacion, pfkidgrupo_participacion);
 
 ALTER TABLE public.certificado ADD CONSTRAINT pk_certificado PRIMARY KEY (pfkidestudianteparticipacion_certificado, pfkidgrupoparticipacion_certificado);

@@ -29,19 +29,11 @@ ALTER TABLE public.curso
 
 ALTER TABLE public.grupo 
     ADD CONSTRAINT 
-        fk_grupo_profesor 
+        fk_grupo_cursoimpartido
     FOREIGN KEY 
-        (fkidprofesor_grupo) 
+        (fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo) 
     REFERENCES 
-        public.perfil (pkcc_perfil);
-
-ALTER TABLE public.grupo 
-    ADD CONSTRAINT 
-        fk_grupo_curso 
-    FOREIGN KEY 
-        (fkidcurso_grupo) 
-    REFERENCES 
-        public.curso (pkid_curso);
+        public.cursoimpartido (pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido);
 
 ALTER TABLE public.participacion 
     ADD CONSTRAINT 

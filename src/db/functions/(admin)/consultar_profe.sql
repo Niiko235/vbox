@@ -1,17 +1,24 @@
 --traer los profesores registrados en el sistema
-CREATE OR REPLACE FUNCTION consultar_profe(profe tipo_perfil)
+CREATE OR REPLACE FUNCTION consultar_profe()
 RETURNS TABLE (
-	PrimerNombre VARCHAR,
-	Cedula BIGINT
+	pkcc           BIGINT,
+    primernombre   VARCHAR,
+    primerapellido VARCHAR,
+    rol            tipo_perfil,
+    email          VARCHAR
 )
 AS $$
 BEGIN
 	RETURN QUERY
 	--consulta
-	SELECT  public.perfil.primernombre_perfil as PrimerNombre,
-		public.perfil.pkcc_perfil as Cedula
-	FROM	public.perfil
-	WHERE	public.perfil.rol = profe;
+	SELECT
+        public.perfil.pkcc_perfil        AS pkcc,
+        public.perfil.primernombre_perfil AS primernombre,
+        public.perfil.primerapellido_perfil AS primerapellido,
+        public.perfil.rol                AS rol,
+        public.perfil.email_perfil       AS email
+    FROM public.perfil
+    WHERE public.perfil.rol = 'profesor';
 END;
 $$
 LANGUAGE plpgsql;

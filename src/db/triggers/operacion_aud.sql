@@ -78,7 +78,27 @@ BEFORE DELETE ON public.curso
 FOR EACH ROW EXECUTE FUNCTION func_curso_delete();
 
 -- ============================================================
--- 5. auditoria.aud_grupo
+-- 5. auditoria.aud_cursoimpartido
+-- ============================================================
+
+--insert 
+CREATE TRIGGER tr_cursoimpartido_insert
+BEFORE INSERT ON public.cursoimpartido
+FOR EACH ROW EXECUTE FUNCTION func_cursoimpartido_insert();
+
+--update new y old
+CREATE TRIGGER tr_cursoimpartido_update
+BEFORE UPDATE ON public.cursoimpartido
+FOR EACH ROW EXECUTE FUNCTION func_cursoimpartido_update();
+
+--delete
+CREATE TRIGGER tr_cursoimpartido_delete
+BEFORE DELETE ON public.cursoimpartido
+FOR EACH ROW EXECUTE FUNCTION func_cursoimpartido_delete();
+
+
+-- ============================================================
+-- 6. auditoria.aud_grupo
 -- ============================================================
 
 --insert 
@@ -97,7 +117,7 @@ BEFORE DELETE ON public.grupo
 FOR EACH ROW EXECUTE FUNCTION func_grupo_delete();
 
 -- ============================================================
--- 6. auditoria.aud_participacion
+-- 7. auditoria.aud_participacion
 -- ============================================================
 
 --insert
@@ -116,7 +136,7 @@ BEFORE DELETE ON public.participacion
 FOR EACH ROW EXECUTE FUNCTION func_participacion_delete();
 
 -- ============================================================
--- 7. auditoria.aud_certificado
+-- 8. auditoria.aud_certificado
 -- ============================================================
 
 --insert 
@@ -135,7 +155,7 @@ BEFORE DELETE ON public.certificado
 FOR EACH ROW EXECUTE FUNCTION func_certificado_delete();
 
 -- ============================================================
--- 8. auditoria.aud_refuerzo
+-- 9. auditoria.aud_refuerzo
 -- ============================================================
 
 --insert 
@@ -154,7 +174,7 @@ BEFORE DELETE ON public.refuerzo
 FOR EACH ROW EXECUTE FUNCTION func_refuerzo_delete();
 
 -- ============================================================
--- 9. auditoria.aud_enlace
+-- 10. auditoria.aud_enlace
 -- ============================================================
 
 --insert
@@ -173,7 +193,7 @@ BEFORE DELETE ON public.enlace
 FOR EACH ROW EXECUTE FUNCTION func_enlace_delete();
 
 -- ============================================================
--- 10. auditoria.aud_ingresorefuerzo
+-- 11. auditoria.aud_ingresorefuerzo
 -- ============================================================
 
 --insert
@@ -192,7 +212,7 @@ BEFORE DELETE ON public.ingresorefuerzo
 FOR EACH ROW EXECUTE FUNCTION func_ingresorefuerzo_delete();
 
 -- ============================================================
--- 11. auditoria.aud_ingresoenlace
+-- 12. auditoria.aud_ingresoenlace
 -- ============================================================
 
 --insert
@@ -211,7 +231,7 @@ BEFORE DELETE ON public.ingresoenlace
 FOR EACH ROW EXECUTE FUNCTION func_ingresoenlace_delete();
 
 -- ============================================================
--- 12. auditoria.aud_modulo
+-- 13. auditoria.aud_modulo
 -- ============================================================
 
 --insert
@@ -230,7 +250,7 @@ BEFORE DELETE ON public.modulo
 FOR EACH ROW EXECUTE FUNCTION func_modulo_delete();
 
 -- ============================================================
--- 13. auditoria.aud_teoria
+-- 14. auditoria.aud_teoria
 -- ============================================================
 
 --insert
@@ -249,7 +269,7 @@ BEFORE DELETE ON public.teoria
 FOR EACH ROW EXECUTE FUNCTION func_teoria_delete();
 
 -- ============================================================
--- 14. auditoria.aud_actividad
+-- 15. auditoria.aud_actividad
 -- ============================================================
 
 --insert 
@@ -268,7 +288,7 @@ BEFORE DELETE ON public.actividad
 FOR EACH ROW EXECUTE FUNCTION func_actividad_delete();
 
 -- ============================================================
--- 15. auditoria.aud_juego
+-- 16. auditoria.aud_juego
 -- ============================================================
 
 --insert 
@@ -287,7 +307,7 @@ BEFORE DELETE ON public.juego
 FOR EACH ROW EXECUTE FUNCTION func_juego_delete();
 
 -- ============================================================
--- 16. auditoria.aud_juegoelegido
+-- 17. auditoria.aud_juegoelegido
 -- ============================================================
 
 --insert
@@ -306,7 +326,7 @@ BEFORE DELETE ON public.juegoelegido
 FOR EACH ROW EXECUTE FUNCTION func_juegoelegido_delete();
 
 -- ============================================================
--- 17. auditoria.aud_ingresojuego
+-- 18. auditoria.aud_ingresojuego
 -- ============================================================
 
 --insert
@@ -325,7 +345,7 @@ BEFORE DELETE ON public.ingresojuego
 FOR EACH ROW EXECUTE FUNCTION func_ingresojuego_delete();
 
 -- ============================================================
--- 18. auditoria.aud_tipocomponente
+-- 19. auditoria.aud_tipocomponente
 -- ============================================================
 
 --insert
@@ -344,7 +364,7 @@ BEFORE DELETE ON public.tipocomponente
 FOR EACH ROW EXECUTE FUNCTION func_tipocomponente_delete();
 
 -- ============================================================
--- 19. auditoria.aud_componente
+-- 20. auditoria.aud_componente
 -- ============================================================
 
 --insert

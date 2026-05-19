@@ -50,6 +50,14 @@ CREATE TABLE auditoria.aud_curso (
     pfkidadministrador_curso BIGINT
 );
 
+CREATE TABLE auditoria.aud_cursoimpartido (
+    fecha_aud TIMESTAMP NOT NULL DEFAULT NOW(),
+    usuario_aud TEXT NOT NULL,
+    operacion_aud tipooperacion_auditoria NOT NULL,
+    pfkidcurso_cursoimpartido INT,
+    pfkidprofesor_cursoimpartido BIGINT
+);
+
 CREATE TABLE auditoria.aud_grupo (
     fecha_aud TIMESTAMP NOT NULL DEFAULT NOW(),
     usuario_aud TEXT NOT NULL,
@@ -58,8 +66,8 @@ CREATE TABLE auditoria.aud_grupo (
     fechacreacion_grupo TIMESTAMP,
     nombre_grupo VARCHAR(20),
     descripcion_grupo VARCHAR(500),
-    fkidprofesor_grupo BIGINT,
-    fkidcurso_grupo INT
+    fkidprofesorcursoimpartido_grupo BIGINT,
+    fkidcursocursoimpartido_grupo INT
 );
 
 CREATE TABLE auditoria.aud_participacion (
