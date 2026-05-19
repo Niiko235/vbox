@@ -1,7 +1,5 @@
 'use client'
 
-
-
 import {
   Sidebar,
   SidebarContent,
@@ -18,17 +16,22 @@ import { LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Separator } from '../ui/separator'
 import Link from 'next/link'
+import { rutesAdmin, rutesStudent, rutesTeacher } from './routes'
 
 type AppSidebarProps = {
-  content: {
-    title: string
-    url: string
-    icon: React.ElementType
-  }[]
+  role: 'student' | 'teacher' | 'admin'  
 }
 
-export function AppSidebar({content}: AppSidebarProps) {
-  
+type content = {
+  title: string
+  url: string
+  icon: React.ElementType
+}[]
+
+export function AppSidebar({ role }: AppSidebarProps) {
+
+  const rutes = (role === 'admin' ? rutesAdmin : role === 'teacher' ? rutesTeacher : rutesStudent) as content
+
   const router = useRouter()
 
   const handleLogout = async () => {
@@ -60,12 +63,12 @@ export function AppSidebar({content}: AppSidebarProps) {
           <SidebarGroupLabel>Contenido</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {content.map((item) => (
-                <SidebarMenuItem key={item.title} >
+              {rutes.map((item) => (
+                <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link href={item.url}>
-                      <item.icon/>
-                      <span className='text-md'>{item.title}</span>
+                      <item.icon />
+                      <span className="text-md">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

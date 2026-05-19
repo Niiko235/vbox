@@ -43,7 +43,7 @@ export default async function HomeLayout({
   
    return (
     <SidebarProvider>
-      <AppSidebar content={rutesStudent} />
+      <AppSidebar role={'student'} />
       <SidebarTrigger />
       <Toaster />
       <main className="w-full mt-2">{children}</main>
