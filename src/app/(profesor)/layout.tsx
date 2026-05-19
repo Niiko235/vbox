@@ -1,6 +1,10 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getSesion } from '@/features/auth/actions/get-sesion'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/sidebar/app-sidebar'
+import { Toaster } from '@/components/ui/sonner'
+import { rutesStudent } from '@/components/sidebar/routes'
 const APP_NAME = 'VBox'
 
 export const metadata: Metadata = {
@@ -35,5 +39,13 @@ export default async function HomeLayout({
   if (userRole.sesion.role === 'administrador') {
     redirect('/inicio')
   }
-  return <>{children}</>
+
+  return (
+    <SidebarProvider>
+      <AppSidebar content={rutesStudent} />
+      <SidebarTrigger />
+      <Toaster />
+      <main className="w-full mt-2">{children}</main>
+    </SidebarProvider>
+  )
 }
