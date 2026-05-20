@@ -121,7 +121,7 @@ CREATE TABLE public.teoria (
     pkid_teoria INT NOT NULL,
     nombre_teoria VARCHAR(20) NOT NULL,
     contenido_teoria TEXT NOT NULL,
-    orden_teoria INT NOT NULL,
+    orden_teoria INT NOT NULL DEFAULT 0,
     fkidmodulo_teoria INT NOT NULL
 );
 

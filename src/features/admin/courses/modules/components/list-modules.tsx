@@ -68,7 +68,7 @@ export function ListModules({ idCurso, initialModulos }: Props) {
                       asChild
                       className="bg-[#3d1f8c] hover:bg-[#2e1769] text-white font-semibold"
                     >
-                      <Link href={`/inicio/cursos/${idCurso}/modulos/${modulo.id}`}>
+                      <Link href={`./${idCurso}/${modulo.id}`}>
                         Administrar Teorías
                       </Link>
                     </Button>
