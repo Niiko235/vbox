@@ -1,4 +1,4 @@
-import { BookOpenText, ChartLine, CircleUser, User } from 'lucide-react'
+import { BookOpenText, ChartLine, CircleUser, LibraryBig, User } from 'lucide-react'
 
 // Rutas del menu para docentes.
 export const rutesTeacher = [
@@ -43,6 +43,11 @@ export const rutesAdmin = [
 ]
 
 export const rutesStudent = [
+  {
+    title: 'Mis grupos',
+    url: '/dashboard/grupos',
+    icon: LibraryBig,
+  },
   {
     title: 'Perfil',
     url: '/dashboard/perfil',
