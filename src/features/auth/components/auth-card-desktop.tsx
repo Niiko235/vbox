@@ -9,12 +9,20 @@ import RegisterForm from './register-form'
 
 const ease = [0.77, 0, 0.175, 1] as const
 
-export function AuthCardDesktop() {
+type Universidad = { id: number; nombre: string }
+type Programa = { id: number; nombre: string; id_universidad: number }
+
+type Props = {
+  universidades: Universidad[]
+  programas: Programa[]
+}
+
+export function AuthCardDesktop({ universidades, programas }: Props) {
   const [isLogin, setIsLogin] = useState(true)
 
   return (
     <Card className="overflow-hidden border-0 shadow-xl p-0 w-full max-w-5xl">
-      <CardContent className="relative grid grid-cols-2 gap-0 p-0 min-h-150">
+      <CardContent className="relative grid grid-cols-2 gap-0 p-0 min-h-160">
         {/* Panel branding — se mueve de izquierda a derecha */}
         <motion.section
           className="flex flex-col items-center justify-center bg-white px-12 py-16 absolute inset-y-0 w-1/2"
@@ -72,7 +80,11 @@ export function AuthCardDesktop() {
                     Crea tu cuenta para acceder a la plataforma
                   </p>
                 </div>
-                <RegisterForm onSwitch={() => setIsLogin(true)} />
+                <RegisterForm
+                  onSwitch={() => setIsLogin(true)}
+                  universidades={universidades}
+                  programas={programas}
+                />
               </motion.div>
             )}
           </AnimatePresence>

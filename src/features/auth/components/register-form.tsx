@@ -1,13 +1,12 @@
 'use client'
 
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import * as z from 'zod'
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
 import {
   Field,
-  FieldError,
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
@@ -27,39 +26,57 @@ import { SelectedProgram } from './selected-program'
 // import { register } from "@/features/auth/actions/register";
 
 const formSchema = z.object({
-  nombres: z.string().min(1, {
-    message: 'Debes ingresar tu nombre para registrarte.',
-  }),
-
-  apellidos: z.string().min(1, {
-    message: 'Debes ingresar tu apellido para registrarte.',
-  }),
-
-  numeroTelefono: z.string().min(1, {
-    message: 'Debes ingresar el número de teléfono para registrarte.',
-  }),
-  cedula: z.string().min(1, {
-    message: 'Debes ingresar la cédula para registrarte.',
-  }),
-  universidad: z.string().min(1, {
-    message: 'Debes seleccionar una universidad para registrarte.',
-  }),
-  fechaNacimiento: z.string().min(1, {
-    message: 'Debes ingresar la fecha de nacimiento para registrarte.',
-  }),
-  programa: z.string().min(1, {
-    message: 'Debes seleccionar un programa para registrarte.',
-  }),
-  email: z.string().min(1, {
-    message: 'Debes ingresar el correo electrónico para ingresar.',
-  }),
-  password: z.string().min(1, {
-    message: 'Debes ingresar la contraseña para ingresar.',
-  }),
+  primernombre: z
+    .string()
+    .min(1, 'El primer nombre es requerido')
+    .max(15, 'El primer nombre no puede tener más de 15 caracteres'),
+  segundonombre: z
+    .string()
+    .max(30, 'El segundo nombre no puede tener más de 30 caracteres')
+    .optional(),
+  primerapellido: z
+    .string()
+    .min(1, 'El primer apellido es requerido')
+    .max(15, 'El primer apellido no puede tener más de 15 caracteres'),
+  segundoapellido: z
+    .string()
+    .max(30, 'El segundo apellido no puede tener más de 30 caracteres')
+    .optional(),
+  cedula: z
+    .string()
+    .min(1, 'La cédula es requerida')
+    .max(18, 'La cédula no puede tener más de 18 caracteres'),
+  fechanacimiento: z.string().min(1, 'La fecha de nacimiento es requerida'),
+  email: z.email('El correo electrónico no es válido'),
+  numerotelefono: z
+    .string()
+    .min(1, 'El número de teléfono es requerido')
+    .max(10, 'El número de teléfono no puede tener más de 10 caracteres'),
+  contrasenia: z
+    .string()
+    .min(1, 'La contraseña es requerida')
+    .max(10, 'La contraseña no puede tener más de 10 caracteres'),
+  confirmarcontrasenia: z
+    .string()
+    .min(1, 'La confirmación de contraseña es requerida')
+    .max(
+      10,
+      'La confirmación de contraseña no puede tener más de 10 caracteres'
+    ),
+  universidad: z.string().min(1, 'Debes seleccionar una universidad'),
+  programa: z.string().min(1, 'Debes seleccionar un programa'),
+}).refine((data) => data.contrasenia === data.confirmarcontrasenia, {
+  message: 'Las contraseñas no coinciden',
+  path: ['confirmarcontrasenia'],
 })
+
+type Universidad = { id: number; nombre: string }
+type Programa = { id: number; nombre: string; id_universidad: number }
 
 type props = {
   onSwitch: () => void
+  universidades: Universidad[]
+  programas: Programa[]
 }
 
 type FormValues = z.infer<typeof formSchema>
@@ -69,27 +86,37 @@ type FormStatus = {
   error?: string
 }
 
-export default function RegisterForm({ onSwitch }: props) {
+export default function RegisterForm({
+  onSwitch,
+  universidades,
+  programas,
+}: props) {
   const router = useRouter()
   const [formStatus, setFormStatus] = useState<FormStatus>({ status: 'idle' })
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nombres: '',
-      apellidos: '',
-      numeroTelefono: '',
+      primernombre: '',
+      segundonombre: '',
+      primerapellido: '',
+      segundoapellido: '',
       cedula: '',
-      universidad: '',
-      fechaNacimiento: undefined,
-      programa: '',
+      fechanacimiento: '',
       email: '',
-      password: '',
+      numerotelefono: '',
+      contrasenia: '',
+      confirmarcontrasenia: '',
+      universidad: '',
+      programa: '',
     },
   })
 
+  const universidadSeleccionada = useWatch({ control: form.control, name: 'universidad' })
+
   async function onSubmit(values: FormValues) {
-    setFormStatus({ status: 'loading' })
+    console.log(values)
+    // setFormStatus({ status: 'loading' })
     // const response = await register(values.email, values.password);
     // if (!response.ok) {
     //   setFormStatus({
@@ -105,104 +132,92 @@ export default function RegisterForm({ onSwitch }: props) {
   return (
     <>
       <form id="form-register" onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup className=''>
+        <FieldGroup className="">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Controller
-              name="nombres"
+              name="primernombre"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-register-nombres">
-                    Nombres *
+                  <FieldLabel htmlFor="form-register-primernombre">
+                    Primer nombre *
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-register-nombres"
+                    id="form-register-primernombre"
                     aria-invalid={fieldState.invalid}
                     placeholder="Fernando"
                     autoComplete="off"
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {/* {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )} */}
                 </Field>
               )}
             />
 
             <Controller
-              name="apellidos"
+              name="segundonombre"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-register-apellidos">
-                    Apellidos *
+                  <FieldLabel htmlFor="form-register-segundonombre">
+                    Segundo nombre
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-register-apellidos"
+                    id="form-register-segundonombre"
                     aria-invalid={fieldState.invalid}
                     placeholder="Valderrama"
                     autoComplete="off"
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {/* {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )} */}
                 </Field>
               )}
             />
             <Controller
-              name="nombres"
+              name="primerapellido"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-register-nombres">
-                    Nombres *
+                  <FieldLabel htmlFor="form-register-primerapellido">
+                    Primer apellido *
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-register-nombres"
+                    id="form-register-primerapellido"
                     aria-invalid={fieldState.invalid}
                     placeholder="Fernando"
                     autoComplete="off"
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {/* {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )} */}
                 </Field>
               )}
             />
 
             <Controller
-              name="apellidos"
+              name="segundoapellido"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-register-apellidos">
-                    Apellidos *
+                  <FieldLabel htmlFor="form-register-segundoapellido">
+                    Segundo apellido
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-register-apellidos"
+                    id="form-register-segundoapellido"
                     aria-invalid={fieldState.invalid}
                     placeholder="Valderrama"
                     autoComplete="off"
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {/* {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )} */}
                 </Field>
               )}
             />
           </div>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Controller
               name="cedula"
               control={form.control}
@@ -221,49 +236,43 @@ export default function RegisterForm({ onSwitch }: props) {
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {/* {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )} */}
                 </Field>
               )}
             />
             <Controller
-              name="numeroTelefono"
+              name="numerotelefono"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-register-numero-telefono">
+                  <FieldLabel htmlFor="form-register-numerotelefono">
                     Número teléfono *
                   </FieldLabel>
                   <Input
                     {...field}
                     type="number"
-                    id="form-register-numero-telefono"
+                    id="form-register-numerotelefono"
                     aria-invalid={fieldState.invalid}
                     placeholder="3214567890"
                     autoComplete="off"
                     disabled={formStatus.status === 'loading'}
                     className="bg-gray-800 border-gray-500"
                   />
-                  {/* {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )} */}
                 </Field>
               )}
             />
             <Controller
-              name="fechaNacimiento"
+              name="fechanacimiento"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-register-fecha-nacimiento">
+                  <FieldLabel htmlFor="form-register-fechanacimiento">
                     Fecha Nacimiento *
                   </FieldLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
-                        id="form-register-fecha-acimiento"
+                        id="form-register-fechanacimiento"
                         className="w-full justify-start text-left text-black"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -279,7 +288,7 @@ export default function RegisterForm({ onSwitch }: props) {
                         selected={
                           field.value ? new Date(field.value) : undefined
                         }
-                        onSelect={field.onChange}
+                        onSelect={(date) => field.onChange(date ? date.toISOString() : '')}
                         captionLayout="dropdown"
                       />
                     </PopoverContent>
@@ -293,42 +302,41 @@ export default function RegisterForm({ onSwitch }: props) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Controller
-            name="universidad"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Universidad *</FieldLabel>
-                <SelectedUni
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={formStatus.status === 'loading'}
-                />
-                {/* {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )} */}
-              </Field>
-            )}
-          />
-          {/* Input de la fecha nacimiento */}
+            <Controller
+              name="universidad"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Universidad *</FieldLabel>
+                  <SelectedUni
+                    value={field.value}
+                    onChange={(id) => {
+                      field.onChange(id)
+                      form.setValue('programa', '')
+                    }}
+                    disabled={formStatus.status === 'loading'}
+                    universidades={universidades}
+                  />
+                </Field>
+              )}
+            />
 
-          <Controller
-            name="programa"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Programa *</FieldLabel>
-                <SelectedProgram
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabled={formStatus.status === 'loading'}
-                />
-                {/* {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )} */}
-              </Field>
-            )}
-          />
+            <Controller
+              name="programa"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Programa *</FieldLabel>
+                  <SelectedProgram
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={formStatus.status === 'loading'}
+                    programas={programas}
+                    universidadId={universidadSeleccionada}
+                  />
+                </Field>
+              )}
+            />
           </div>
           <Controller
             name="email"
@@ -347,59 +355,50 @@ export default function RegisterForm({ onSwitch }: props) {
                   disabled={formStatus.status === 'loading'}
                   className="bg-gray-800 border-gray-500"
                 />
-                {/* {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )} */}
               </Field>
             )}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Controller
-            name="password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="form-register-password">
-                  Contraseña*
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="form-register-password"
-                  placeholder="est123"
-                  aria-invalid={fieldState.invalid}
-                  autoComplete="off"
-                  disabled={formStatus.status === 'loading'}
-                  className="bg-gray-800 border-gray-500"
-                />
-                {/* {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )} */}
-              </Field>
-            )}
-          />
+              name="contrasenia"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-register-contrasenia">
+                    Contraseña*
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-register-contrasenia"
+                    placeholder="est123"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    disabled={formStatus.status === 'loading'}
+                    className="bg-gray-800 border-gray-500"
+                  />
+                </Field>
+              )}
+            />
             <Controller
-            name="password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="form-register-password">
-                  Confirmar Contraseña *
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="form-register-password"
-                  placeholder="est123"
-                  aria-invalid={fieldState.invalid}
-                  autoComplete="off"
-                  disabled={formStatus.status === 'loading'}
-                  className="bg-gray-800 border-gray-500"
-                />
-                {/* {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )} */}
-              </Field>
-            )}
-          />
+              name="confirmarcontrasenia"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-register-confirmarcontrasenia">
+                    Confirmar Contraseña *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-register-confirmarcontrasenia"
+                    placeholder="est123"
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                    disabled={formStatus.status === 'loading'}
+                    className="bg-gray-800 border-gray-500"
+                  />
+                </Field>
+              )}
+            />
           </div>
         </FieldGroup>
 

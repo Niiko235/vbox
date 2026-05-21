@@ -1,40 +1,43 @@
---traer universidad
-
+-- Retorna todas las universidades con su ID y nombre
 CREATE OR REPLACE FUNCTION retornar_universidad()
 RETURNS TABLE(
-	Universidad VARCHAR
+	id          INT,
+	nombre      VARCHAR
 )
 AS $$
 BEGIN
 	RETURN QUERY
-	--consulta
-	SELECT	public.universidad.nombre_universidad as Universidad
-	FROM public.universidad
-	ORDER BY public.universidad.pkcodigoies_universidad ASC;
-
+	SELECT
+		u.pkcodigoies_universidad AS id,
+		u.nombre_universidad      AS nombre
+	FROM public.universidad u
+	ORDER BY u.pkcodigoies_universidad ASC;
 END;
 $$
 LANGUAGE plpgsql;
 
---llamar
+-- llamar
 SELECT * FROM retornar_universidad();
 
---retorno programas
-
-CREATE OR REPLACE FUNCTION retorno_programas(codigo_universidad INT)
+-- Retorna todos los programas con su ID, nombre e ID de universidad
+CREATE OR REPLACE FUNCTION retornar_programas()
 RETURNS TABLE (
-	Programa VARCHAR
+	id             INT,
+	nombre         VARCHAR,
+	id_universidad INT
 )
 AS $$
 BEGIN
 	RETURN QUERY
-	--consulta
-	SELECT public.programa.nombre_programa as Programa
-	FROM public.programa
-	WHERE public.programa.fkiduniversidad_programa = codigo_universidad;
+	SELECT
+		p.pkcodigo_programa          AS id,
+		p.nombre_programa            AS nombre,
+		p.fkiduniversidad_programa   AS id_universidad
+	FROM public.programa p
+	ORDER BY p.pkcodigo_programa ASC;
 END;
 $$
 LANGUAGE plpgsql;
 
---llamar 
-SELECT * FROM retorno_programas(2);
+-- llamar
+SELECT * FROM retornar_programas();
