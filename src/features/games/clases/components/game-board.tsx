@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import {
   ReactFlow,
   Background,
@@ -8,6 +8,8 @@ import {
   Controls,
   type NodeChange,
   type Node,
+  type Edge,
+  type Connection,
 } from '@xyflow/react'
 import { CheckCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -22,12 +24,19 @@ import {
   UMLClassNode,
   type UMLClassNodeData,
 } from '@/features/games/clases/components/uml-class-node'
+import {
+  RelacionEdge,
+  UMLMarkerDefs,
+  type RelacionEdgeData,
+} from '@/features/games/clases/components/custom-edges'
+import { RelationTypeDialog } from '@/features/games/clases/components/relation-type-dialog'
 import { validateGame, type ValidateGameResult } from '@/features/games/clases/actions/validate-game'
-import type { GameData } from '@/features/games/clases/actions/get-game-data'
+import type { GameData, TipoRelacion } from '@/features/games/clases/actions/get-game-data'
 
-// ─── Tipos de nodos registrados en ReactFlow ──────────────────────────────────
+// ─── Tipos de nodos y aristas registrados en ReactFlow ────────────────────────
 
 const nodeTypes = { umlClass: UMLClassNode }
+const edgeTypes = { relacion: RelacionEdge }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -39,19 +48,28 @@ type Props = {
 // ─── Componente ───────────────────────────────────────────────────────────────
 
 export function GameBoard({ data, grupoId }: Props) {
-  const { inicializar, clases, actualizarPosicion, componentesDisponibles } =
-    useGameStore()
+  const {
+    inicializar,
+    clases,
+    actualizarPosicion,
+    componentesDisponibles,
+    relaciones,
+    agregarRelacion,
+  } = useGameStore()
 
   const [isCalificando, setIsCalificando] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [resultado, setResultado] = useState<ValidateGameResult | null>(null)
 
-  // Inicializar el store con los datos del servidor (solo una vez)
+  // ── Estado para el dialog de selección de tipo de relación ────────────────
+  const [pendingConnection, setPendingConnection] = useState<Connection | null>(null)
+
   useEffect(() => {
     inicializar(data)
   }, [data, inicializar])
 
-  // Derivar nodos de ReactFlow desde el store
+  // ── Nodos ─────────────────────────────────────────────────────────────────
+
   const nodes = useMemo<Node<UMLClassNodeData>[]>(
     () =>
       clases.map((clase) => ({
@@ -68,7 +86,6 @@ export function GameBoard({ data, grupoId }: Props) {
     [clases]
   )
 
-  // Sincronizar posiciones al store cuando el usuario mueve un nodo
   const onNodesChange = (changes: NodeChange[]) => {
     for (const change of changes) {
       if (change.type === 'position' && change.position) {
@@ -77,7 +94,46 @@ export function GameBoard({ data, grupoId }: Props) {
     }
   }
 
-  // ── Calificar ───────────────────────────────────────────────────────────────
+  // ── Aristas ───────────────────────────────────────────────────────────────
+
+  const edges = useMemo<Edge<RelacionEdgeData>[]>(
+    () =>
+      relaciones.map((r) => ({
+        id: r.id,
+        source: String(r.claseOrigen),
+        target: String(r.claseDestino),
+        type: 'relacion',
+        data: { tipo: r.tipo },
+      })),
+    [relaciones]
+  )
+
+  // ── onConnect: guardar conexión pendiente y abrir dialog ──────────────────
+
+  const onConnect = useCallback((connection: Connection) => {
+    // Evitar auto-conexión
+    if (connection.source === connection.target) return
+    setPendingConnection(connection)
+  }, [])
+
+  const handleSelectTipo = (tipo: TipoRelacion) => {
+    if (!pendingConnection) return
+    const origenId = Number(pendingConnection.source)
+    const destinoId = Number(pendingConnection.target)
+
+    agregarRelacion({
+      id: `${origenId}-${destinoId}`,
+      claseOrigen: origenId,
+      claseDestino: destinoId,
+      tipo,
+    })
+
+    setPendingConnection(null)
+  }
+
+  const handleCancelRelacion = () => setPendingConnection(null)
+
+  // ── Calificar ─────────────────────────────────────────────────────────────
 
   const handleCalificar = async () => {
     setIsCalificando(true)
@@ -94,6 +150,7 @@ export function GameBoard({ data, grupoId }: Props) {
       juegoId: data.juego.id,
       grupoId,
       clases: respuesta,
+      relacionesEstudiante: relaciones,
     })
 
     setIsCalificando(false)
@@ -112,21 +169,22 @@ export function GameBoard({ data, grupoId }: Props) {
   return (
     <div className="flex h-full w-full overflow-hidden">
 
-      {/* ── Canvas ──────────────────────────────────────────────────── */}
+      {/* Marcadores SVG para los extremos de las aristas */}
+      <UMLMarkerDefs />
+
+      {/* ── Canvas ──────────────────────────────────────────────── */}
       <div className="relative flex-1 bg-slate-50">
         <ReactFlow
           nodes={nodes}
-          edges={[]}
+          edges={edges}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onNodesChange={onNodesChange}
+          onConnect={onConnect}
           fitView
           fitViewOptions={{ padding: 0.2 }}
           minZoom={0.3}
           maxZoom={2}
-          defaultEdgeOptions={{
-            style: { stroke: '#94a3b8', strokeWidth: 1.5 },
-            type: 'smoothstep',
-          }}
         >
           <Background
             variant={BackgroundVariant.Dots}
@@ -170,6 +228,13 @@ export function GameBoard({ data, grupoId }: Props) {
 
       {/* ── Side Panel ──────────────────────────────────────────────── */}
       <SidePanel />
+
+      {/* ── Dialog selector de tipo de relación ─────────────────────── */}
+      <RelationTypeDialog
+        open={pendingConnection !== null}
+        onSelect={handleSelectTipo}
+        onCancel={handleCancelRelacion}
+      />
 
       {/* ── Dialog de resultados ────────────────────────────────────── */}
       <ResultsDialog

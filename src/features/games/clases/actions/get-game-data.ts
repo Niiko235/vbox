@@ -17,7 +17,7 @@ type ComponenteRow = {
   nombre: string
   extra: Record<string, unknown> | null
   retroalimentacion: string | null
-  nombre_tipo_componente: 'Clase' | 'Atributo' | 'Metodo'
+  nombre_tipo_componente: 'Clase' | 'Atributo' | 'Metodo' | 'Relacion'
 }
 
 // ─── Tipos de dominio (lo que consume el frontend) ───────────────────────────
@@ -30,6 +30,22 @@ export type ExtraAtributo = {
 export type ExtraClase = {
   x: number
   y: number
+}
+
+export type TipoRelacion = 'Asociacion' | 'Agregacion' | 'Composicion' | 'Herencia'
+
+export type ExtraRelacion = {
+  claseOrigen: number
+  claseDestino: number
+  tipo: TipoRelacion
+}
+
+export type RelacionSolucion = {
+  id: number
+  claseOrigen: number
+  claseDestino: number
+  tipo: TipoRelacion
+  retroalimentacion: string | null
 }
 
 export type ClaseNode = {
@@ -50,6 +66,7 @@ export type GameData = {
   juego: JuegoRow
   clases: ClaseNode[]
   componentesDisponibles: ComponenteDisponible[]
+  relacionesSolucion: RelacionSolucion[]
 }
 
 // ─── Respuesta estándar ───────────────────────────────────────────────────────
@@ -106,12 +123,26 @@ export const getGameData = cache(async function getGameData(
         retroalimentacion: c.retroalimentacion,
       }))
 
+    const relacionesSolucion: RelacionSolucion[] = componenteRows
+      .filter((c) => c.nombre_tipo_componente === 'Relacion')
+      .map((c) => {
+        const extra = c.extra as ExtraRelacion
+        return {
+          id: c.id,
+          claseOrigen: extra.claseOrigen,
+          claseDestino: extra.claseDestino,
+          tipo: extra.tipo,
+          retroalimentacion: c.retroalimentacion,
+        }
+      })
+
     return {
       success: true,
       data: {
         juego: juegoRows[0],
         clases,
         componentesDisponibles,
+        relacionesSolucion,
       },
     }
   } catch (error) {

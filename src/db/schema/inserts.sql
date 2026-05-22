@@ -344,5 +344,6 @@ INSERT INTO public.componente (
     fkidtipocomponente_componente, fkidjuego_componente
 ) VALUES
 (10, 'agregar()', '{"visibilidad": "public", "tipo": "void"}', 2, 'agregar() anade un producto al Carrito.', 3, 1),
-(11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1);
+(11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1),
+(12, null, '{"claseOrigen": 1, "claseDestino": 2, "tipo": "Agregacion"} ', null, 'Carrito agrega Productos, ya que un Carrito puede contener múltiples Productos pero estos pueden existir de forma independiente.', 4, 1);
 

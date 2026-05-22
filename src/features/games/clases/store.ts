@@ -3,6 +3,7 @@ import type {
   GameData,
   ComponenteDisponible,
   ExtraAtributo,
+  TipoRelacion,
 } from '@/features/games/clases/actions/get-game-data'
 
 // ─── Tipos internos del store ─────────────────────────────────────────────────
@@ -13,6 +14,15 @@ export type ClaseEnCanvas = {
   posicion: { x: number; y: number }
   atributos: ComponenteDisponible[]
   metodos: ComponenteDisponible[]
+}
+
+// ─── Relación dibujada por el estudiante ──────────────────────────────────────
+
+export type RelacionEstudiante = {
+  id: string // `${claseOrigen}-${claseDestino}`
+  claseOrigen: number
+  claseDestino: number
+  tipo: TipoRelacion
 }
 
 // ─── Payload del drag & drop ──────────────────────────────────────────────────
@@ -30,6 +40,7 @@ type GameStore = {
   juegoId: number | null
   clases: ClaseEnCanvas[]
   componentesDisponibles: ComponenteDisponible[]
+  relaciones: RelacionEstudiante[]
 
   // Inicializa el estado con los datos que llegan de la DB
   inicializar: (data: GameData) => void
@@ -52,6 +63,10 @@ type GameStore = {
     claseId: number,
     posicion: { x: number; y: number }
   ) => void
+
+  // Relaciones
+  agregarRelacion: (relacion: RelacionEstudiante) => void
+  eliminarRelacion: (relacionId: string) => void
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -115,10 +130,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   juegoId: null,
   clases: [],
   componentesDisponibles: [],
+  relaciones: [],
 
   inicializar: (data) => {
     set({
       juegoId: data.juego.id,
+      relaciones: [],
       clases: data.clases.map((c) => ({
         id: c.id,
         nombre: c.nombre,
@@ -175,6 +192,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       clases: state.clases.map((c) =>
         c.id === claseId ? { ...c, posicion } : c
       ),
+    }))
+  },
+
+  agregarRelacion: (relacion) => {
+    set((state) => {
+      // Evitar duplicados entre el mismo par de clases
+      const existe = state.relaciones.some((r) => r.id === relacion.id)
+      if (existe) return state
+      return { relaciones: [...state.relaciones, relacion] }
+    })
+  },
+
+  eliminarRelacion: (relacionId) => {
+    set((state) => ({
+      relaciones: state.relaciones.filter((r) => r.id !== relacionId),
     }))
   },
 }))
