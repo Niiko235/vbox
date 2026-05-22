@@ -57,7 +57,7 @@ function AtributoRow({ componente, claseId }: RowProps<ComponenteDisponible>) {
         <button
           data-nodrag
           onClick={() => moverAlSidePanel(componente.id, claseId)}
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-red-400"
+          className="p-1 rounded text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
         >
           <X size={13} />
         </button>
@@ -78,7 +78,7 @@ function MetodoRow({ componente, claseId }: RowProps<ComponenteDisponible>) {
       <button
         data-nodrag
         onClick={() => moverAlSidePanel(componente.id, claseId)}
-        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-red-400 ml-2 shrink-0"
+        className="p-1 rounded text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors ml-2 shrink-0"
       >
         <X size={13} />
       </button>
