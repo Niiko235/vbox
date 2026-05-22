@@ -1,27 +1,41 @@
---traer los profesores registrados en el sistema
+-- Traer todos los datos de los profesores registrados en el sistema
 CREATE OR REPLACE FUNCTION consultar_profe()
 RETURNS TABLE (
-	pkcc           BIGINT,
-    primernombre   VARCHAR,
-    primerapellido VARCHAR,
-    rol            tipo_perfil,
-    email          VARCHAR
+    pkcc              BIGINT,
+    primernombre      VARCHAR,
+    segundonombre     VARCHAR,
+    primerapellido    VARCHAR,
+    segundoapellido   VARCHAR,
+    rol               tipo_perfil,
+    fechanacimiento   TIMESTAMP,
+    telefono          BIGINT,
+    email             VARCHAR,
+    codigoprograma    INT,
+    nombreprograma    VARCHAR,
+    codigouniversidad INT
 )
 AS $$
 BEGIN
-	RETURN QUERY
-	--consulta
-	SELECT
-        public.perfil.pkcc_perfil        AS pkcc,
-        public.perfil.primernombre_perfil AS primernombre,
-        public.perfil.primerapellido_perfil AS primerapellido,
-        public.perfil.rol                AS rol,
-        public.perfil.email_perfil       AS email
-    FROM public.perfil
-    WHERE public.perfil.rol = 'profesor';
+    RETURN QUERY
+    SELECT
+        p.pkcc_perfil              AS pkcc,
+        p.primernombre_perfil      AS primernombre,
+        p.segundonombre_perfil     AS segundonombre,
+        p.primerapellido_perfil    AS primerapellido,
+        p.segundoapellido_perfil   AS segundoapellido,
+        p.rol                      AS rol,
+        p.fechanacimiento_perfil   AS fechanacimiento,
+        p.telefono_perfil          AS telefono,
+        p.email_perfil             AS email,
+        pr.pkcodigo_programa       AS codigoprograma,
+        pr.nombre_programa         AS nombreprograma,
+        pr.fkiduniversidad_programa AS codigouniversidad
+    FROM public.perfil p
+    JOIN public.programa pr ON pr.pkcodigo_programa = p.fkcodigoprograma_perfil
+    WHERE p.rol = 'profesor';
 END;
 $$
 LANGUAGE plpgsql;
 
---ejecución
-SELECT * FROM consultar_profe('profesor');
+-- Ejecución
+SELECT * FROM consultar_profe();

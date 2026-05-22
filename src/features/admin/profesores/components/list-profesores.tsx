@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, Plus, FileText } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -13,16 +13,29 @@ import {
 } from '@/components/ui/table'
 import type { Profesor } from '../actions/get-all-profesores'
 import { AlertDialogDeleteTeacher } from './alert-dialog-delete-teacher'
+import { DialogCreateTeacherForm } from './dialog-create-teacher-form'
+import { DialogEditTeacherForm } from './dialog-edit-teacher-form'
+
+type Universidad = { id: number; nombre: string }
+type Programa = { id: number; nombre: string; id_universidad: number }
 
 type Props = {
   initialProfesores: Profesor[]
+  universidades: Universidad[]
+  programas: Programa[]
 }
 
-export function ListProfesores({ initialProfesores }: Props) {
+export function ListProfesores({ initialProfesores, universidades, programas }: Props) {
   const [profesores, setProfesores] = useState<Profesor[]>(initialProfesores)
 
   const handleCrear = (profesor: Profesor) => {
     setProfesores((prev) => [...prev, profesor])
+  }
+
+  const handleEditar = (profesorActualizado: Profesor) => {
+    setProfesores((prev) =>
+      prev.map((p) => (p.pkcc === profesorActualizado.pkcc ? profesorActualizado : p))
+    )
   }
 
   const handleEliminar = (pkcc: string) => {
@@ -41,22 +54,11 @@ export function ListProfesores({ initialProfesores }: Props) {
         </div>
       </div>
       <div>
-        {/* Dialog de crear — por implementar */}
-        <Button
-          className="bg-[#3d1f8c] hover:bg-[#2e1769] text-white"
-          onClick={() =>
-            handleCrear({
-              pkcc: Date.now().toString(),
-              primernombre: 'Nuevo',
-              primerapellido: 'Profesor',
-              email: 'nuevo@test.com',
-              rol: 'profesor',
-            })
-          }
-        >
-          <Plus size={16} />
-          Crear Profesor
-        </Button>
+        <DialogCreateTeacherForm
+          universidades={universidades}
+          programas={programas}
+          handleCrear={handleCrear}
+        />
       </div>
 
       {profesores.length === 0 ? (
@@ -100,14 +102,12 @@ export function ListProfesores({ initialProfesores }: Props) {
                   <TableCell className="px-6 py-4">{profesor.email}</TableCell>
                   <TableCell className="px-6 py-4">
                     <div className="flex gap-2">
-                      {/* Dialog de editar — por implementar */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
-                      >
-                        <Pencil size={18} />
-                      </Button>
+                      <DialogEditTeacherForm
+                        profesor={profesor}
+                        universidades={universidades}
+                        programas={programas}
+                        handleEditar={handleEditar}
+                      />
                       <AlertDialogDeleteTeacher
                         cedula={profesor.pkcc}
                         nombreProfesor={`${profesor.primernombre} ${profesor.primerapellido}`}
