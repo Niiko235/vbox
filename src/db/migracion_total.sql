@@ -54,10 +54,11 @@ CREATE TABLE public.grupo (
     fkidcursocursoimpartido_grupo INT NOT NULL
 );
 
-CREATE TABLE public.cursoimpartido{
+CREATE TABLE public.cursoimpartido(
     pfkidcurso_cursoimpartido INT NOT NULL,
     pfkidprofesor_cursoimpartido BIGINT NOT NULL
-}
+);
+
 
 CREATE TABLE public.participacion (
     pfkidestudiante_participacion BIGINT NOT NULL,
@@ -666,359 +667,6 @@ CREATE TABLE auditoria.aud_componente (
     fkidtipocomponente_componente INT,
     fkidjuego_componente INT
 );
-
-
---insert de pruebas
-
--- ============================================================
--- 1. universidad
--- ============================================================
- 
-INSERT INTO public.universidad (pkcodigoies_universidad, nombre_universidad, tipo_universidad) VALUES
-(1, 'UniversidadAmazonia',    'publica'),
-(2, 'UniAndes',       'privada'),
-(3, 'UniCordoba',     'publica');
- 
- 
--- ============================================================
--- 2. programa
--- ============================================================
- 
-INSERT INTO public.programa (pkcodigo_programa, nombre_programa, fkiduniversidad_programa) VALUES
-(101, 'Ing. Sistemas',   1),
-(102, 'Medicina',        2),
-(103, 'Derecho',         3);
- 
- 
--- ============================================================
--- 3. perfil
--- ============================================================
- 
-INSERT INTO public.perfil (
-    pkcc_perfil, primernombre_perfil, segundonombre_perfil,
-    primerapellido_perfil, segundoapellido_perfil, rol,
-    fechanacimiento_perfil, telefono_perfil, email_perfil,
-    contrasenia_perfil, fkcodigoprograma_perfil
-) VALUES
-(1001, 'Carlos',   'Andres',  'Perez',   'Lopez',   'administrador', '1980-03-15', 3001234567, 'caperez@uni.edu',   'admin123',  101),
-(1002, 'Laura',    'Maria',   'Gomez',   'Torres',  'profesor',      '1985-07-22', 3109876543, 'lagomez@uni.edu',   'prof456',   102),
-(1003, 'Santiago', NULL,      'Ramirez', 'Herrera', 'estudiante',    '2001-11-05', 3207654321, 'saramirez@uni.edu', 'est789',    101),
-(1004, 'Valentina','Paola',   'Rios',    NULL,      'estudiante',    '2002-04-18', 3158887766, 'vrios@uni.edu',     'est321',    102),
-(1005, 'Andres',   'Felipe',  'Mora',    'Castro',  'profesor',      '1990-09-30', 3001122334, 'afmora@uni.edu',    'prof789',   103);
- 
- 
--- ============================================================
--- 4. curso
--- ============================================================
- 
-INSERT INTO public.curso (
-    pkid_curso, nombre_curso, descripcion_curso,
-    imagen_curso, fechacreacion_curso, pfkidadministrador_curso
-) VALUES
-(1, 'Python Basico',   'Introduccion a la programacion con Python.',         'https://img.uni.edu/python.png',   '2024-01-10 08:00:00', 1001),
-(2, 'Bases de Datos',  'Fundamentos de SQL y modelado relacional.',           'https://img.uni.edu/bd.png',       '2024-01-15 09:00:00', 1001),
-(3, 'Redes I',         'Conceptos basicos de redes y telecomunicaciones.',   'https://img.uni.edu/redes.png',    '2024-02-01 10:00:00', 1001);
- 
--- ============================================================
--- 5. CURSO IMPARTIDO
--- ============================================================
-
-INSERT INTO public.cursoimpartido (pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido) VALUES
-(1, 1002),
-(2, 1005),
-(3, 1002);
-
- 
--- ============================================================
--- 6. grupo
--- ============================================================
- 
-INSERT INTO public.grupo (
-    pkid_grupo, fechacreacion_grupo, nombre_grupo,
-    descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
-) VALUES
-(1, '2024-02-05 08:00:00', 'Grupo A',  'Grupo A de Python Basico semestre 2024-1.',   1002, 1),
-(2, '2024-02-05 08:30:00', 'Grupo B',  'Grupo B de Bases de Datos semestre 2024-1.',  1005, 2),
-(3, '2024-02-06 09:00:00', 'Grupo C',  'Grupo C de Redes I semestre 2024-1.',         1002, 3);
- 
- 
--- ============================================================
--- 7. participación
--- ============================================================
- 
-INSERT INTO public.participacion (
-    pfkidestudiante_participacion, pfkidgrupo_participacion,
-    estado_participacion, fecharegistro_participacion,
-    puntuaciontotal_participacion, puntuaciontotalmaterial_participacion,
-    puntuaciontotallink_participacion
-) VALUES
-(1003, 1, TRUE,  '2024-02-10 10:00:00', 85,  50, 35),
-(1004, 2, TRUE,  '2024-02-10 10:30:00', 70,  40, 30),
-(1003, 2, FALSE, '2024-02-11 08:00:00',  0,   0,  0),
-(1004, 3, TRUE,  '2024-02-12 09:00:00', 60,  35, 25);
- 
- 
--- ============================================================
--- 8. certificado
--- ============================================================
- 
-INSERT INTO public.certificado (
-    pfkidestudianteparticipacion_certificado,
-    pfkidgrupoparticipacion_certificado,
-    titulo_certificado, fechaentregado_certificado
-) VALUES
-(1003, 1, 'Cert. Python',  '2024-06-20 12:00:00'),
-(1004, 2, 'Cert. BD',      '2024-06-21 12:00:00'),
-(1004, 3, 'Cert. Redes',   '2024-06-22 12:00:00');
- 
- 
--- ============================================================
--- 9. modulo
--- ============================================================
- 
-INSERT INTO public.modulo (pkid_modulo, numerorefuerzos_modulo, nombre_modulo, fkidcurso_modulo) VALUES
-(1, 3, 'Variables',    1),
-(2, 2, 'Funciones',    1),
-(3, 4, 'Modelo ER',    2),
-(4, 2, 'SQL Basico',   2),
-(5, 3, 'Capa Fisica',  3);
- 
- 
--- ============================================================
--- 10. refuerzo
--- ============================================================
- 
-INSERT INTO public.refuerzo (
-    pkid_refuerzo, explicacion_refuerzo,
-    puntuacion_refuerzo, fkidgrupo_refuerzo, fkidmodulo_refuerzo
-) VALUES
-(1, 'Repaso de tipos de datos en Python y ejemplos practicos.',     10, 1, 1),
-(2, 'Ejercicios de funciones con parametros y retorno.',            15, 1, 2),
-(3, 'Practica de diagramas entidad-relacion con casos reales.',     10, 2, 3),
-(4, 'Consultas SELECT basicas con filtros WHERE y ORDER BY.',       20, 2, 4),
-(5, 'Introduccion a medios de transmision y topologias de red.',    10, 3, 5);
- 
- 
--- ============================================================
--- 11. enlace
--- ============================================================
- 
-INSERT INTO public.enlace (
-    pkid_enlace, tipo_enlace, contenido_enlace,
-    puntuacion_enlace, fkidrefuerzo_enlace
-) VALUES
-(1, 'Video',      'https://youtube.com/python-variables',       5,  1),
-(2, 'Documento',  'https://docs.uni.edu/python-variables.pdf',  5,  1),
-(3, 'Sitio web',  'https://w3schools.com/python/functions',     5,  2),
-(4, 'Video',      'https://youtube.com/modelo-er-intro',        5,  3),
-(5, 'Documento',  'https://docs.uni.edu/sql-basico.pdf',        10, 4),
-(6, 'Sitio web',  'https://cisco.com/redes-basico',             5,  5);
- 
- 
--- ============================================================
--- 12. ingresorefuerzo
--- ============================================================
- 
-INSERT INTO public.ingresorefuerzo (
-    pkid_ingresorefuerzo, puntuacionobtenida_ingresorefuerzo,
-    fecharegistro_ingresorefuerzo,
-    fkidestudianteparticipacion_ingresorefuerzo,
-    fkidgrupoparticipacion_ingresorefuerzo,
-    fkidrefuerzo_ingresorefuerzo
-) VALUES
-(1, 10, '2024-03-05 10:00:00', 1003, 1, 1),
-(2, 12, '2024-03-06 11:00:00', 1003, 1, 2),
-(3,  8, '2024-03-07 09:30:00', 1004, 2, 3),
-(4, 18, '2024-03-08 14:00:00', 1004, 2, 4),
-(5,  7, '2024-03-09 10:00:00', 1004, 3, 5);
- 
- 
--- ============================================================
--- 13. ingresoenlace
--- ============================================================
- 
-INSERT INTO public.ingresoenlace (
-    pkid_ingresoenlace, puntuacionobtenida_ingresoenlace,
-    fecharegistro_ingresoenlace,
-    fkidestudianteparticipacion_ingresoenlace,
-    fkidgrupoparticipacion_ingresoenlace,
-    fkidenlace_ingresoenlace
-) VALUES
-(1, 5,  '2024-03-05 10:30:00', 1003, 1, 1),
-(2, 5,  '2024-03-05 11:00:00', 1003, 1, 2),
-(3, 5,  '2024-03-06 09:00:00', 1004, 2, 4),
-(4, 10, '2024-03-07 14:30:00', 1004, 2, 5),
-(5, 5,  '2024-03-08 10:00:00', 1004, 3, 6);
- 
- 
--- ============================================================
--- 14. teoria
--- ============================================================
- 
-INSERT INTO public.teoria (
-    pkid_teoria, nombre_teoria, contenido_teoria,
-    orden_teoria, fkidmodulo_teoria
-) VALUES
-(1, 'Que es Python',     'Python es un lenguaje interpretado, dinamico y multiparadigma.',          1, 1),
-(2, 'Tipos de datos',    'En Python los tipos principales son int, float, str, bool y list.',       2, 1),
-(3, 'Def y Return',      'Las funciones se definen con def y pueden retornar valores con return.',   1, 2),
-(4, 'Entidades',         'Una entidad representa un objeto del mundo real en el modelo ER.',        1, 3),
-(5, 'Relaciones ER',     'Las relaciones conectan entidades con cardinalidad 1:1, 1:N o N:M.',      2, 3),
-(6, 'SELECT basico',     'SELECT * FROM tabla WHERE condicion ORDER BY columna;',                   1, 4),
-(7, 'Medios fisicos',    'Los medios de transmision pueden ser cableados o inalambricos.',          1, 5);
- 
- 
--- ============================================================
--- 15. actividad
--- ============================================================
- 
-INSERT INTO public.actividad (
-    pkid_actividad, nombre_actividad, url_actividad,
-    disponible_actividad, fkidteoria_actividad
-) VALUES
-(1, 'Quiz Variables',   'https://act.uni.edu/quiz-variables',   TRUE,  2),
-(2, 'Ejerc Funciones',  'https://act.uni.edu/ejerc-funciones',  TRUE,  3),
-(3, 'Quiz Entidades',   'https://act.uni.edu/quiz-entidades',   TRUE,  4),
-(4, 'Taller ER',        'https://act.uni.edu/taller-er',        FALSE, 5),
-(5, 'Quiz SELECT',      'https://act.uni.edu/quiz-select',      TRUE,  6),
-(6, 'Lab Redes',        'https://act.uni.edu/lab-redes',        FALSE, 7);
- 
- 
--- ============================================================
--- 16. juego
--- ============================================================
- 
-INSERT INTO public.juego (
-    pkid_juego, nombre_juego, descripcion_juego,
-    puntuacion_juego, fkidmodulo_juego, fkidgrupo_juego
-) VALUES
-(1, 'Ahorcado Py',    'Adivina el termino de programacion en Python.',   20, 1, 1),
-(2, 'Quiz ER',        'Preguntas de seleccion multiple sobre modelo ER.', 20, 3, 2),
-(3, 'Crucigrama SQL', 'Crucigrama con comandos y clausulas SQL.',         20, 4, 2),
-(4, 'Trivia Redes',   'Preguntas rapidas sobre topologias y protocolos.', 20, 5, 3);
- 
- 
--- ============================================================
--- 17. juegoelegido
--- ============================================================
- 
-INSERT INTO public.juegoelegido (pfkidjuego_juegoelegido, pfkidgrupo_juegoelegido) VALUES
-(1, 1),
-(2, 2),
-(3, 2),
-(4, 3);
- 
- 
--- ============================================================
--- 18. ingresojuego
--- ============================================================
- 
-INSERT INTO public.ingresojuego (
-    pkid_ingresojuego, puntuacionobtenida_ingresojuego,
-    fecharegistro_ingresojuego,
-    fkidestudianteparticipacion_ingresojuego,
-    fkidgrupoparticipacion_ingresojuego,
-    fkidjuegojuegoelegido_ingresojuego,
-    fkidgrupojuegoelegido_ingresojuego
-) VALUES
-(1, 18, '2024-04-10 10:00:00', 1003, 1, 1, 1),
-(2, 15, '2024-04-11 11:00:00', 1004, 2, 2, 2),
-(3, 20, '2024-04-12 09:00:00', 1004, 2, 3, 2),
-(4, 12, '2024-04-13 14:00:00', 1004, 3, 4, 3);
- 
- 
--- ============================================================
--- 19. tipocomponente
--- Tipos para diagrama de clases UML (modulo 3 - Modelo ER/UML)
--- ============================================================
-
-INSERT INTO public.tipocomponente (pkid_tipocomponente, nombre_tipocomponente, fkidmodulo_tipocomponente) VALUES
-(1, 'Clase',    3),
-(2, 'Atributo', 3),
-(3, 'Metodo',   3),
-(4, 'Relacion', 3);
-
-
--- ============================================================
--- 20. componente — Juego: "Producto y Carrito"  (pkid_juego = 1)
---
--- Jerarquia:
---   Clases (sin padre):
---     1  → Producto
---     2  → Carrito
---
---   Atributos de Producto (padre = 1):
---     3  → nombre    (private, string)
---     4  → precio    (private, number)
---     5  → stock     (private, number)
---
---   Metodos de Producto (padre = 1):
---     6  → aplicarDescuento()  (public)
---     7  → estaDisponible()    (public)
---
---   Atributos de Carrito (padre = 2):
---     8  → total     (private, number)
---     9  → cantidad  (private, number)
---
---   Metodos de Carrito (padre = 2):
---     10 → agregar() (public)
---     11 → vaciar()  (public)
--- ============================================================
-
--- Clases (raiz, sin padre)
-
-INSERT INTO public.componente (
-    pkid_componente, nombre_componente, extra_componente,
-    componentepadre_componente, retroalimentacion_componente,
-    fkidtipocomponente_componente, fkidjuego_componente
-) VALUES
-(1, 'Producto', '{"x": 100, "y": 150}', NULL, NULL, 1, 1),
-(2, 'Carrito',  '{"x": 500, "y": 150}', NULL, NULL, 1, 1);
-
--- Atributos de Producto (padre = 1)
-
-INSERT INTO public.componente (
-    pkid_componente, nombre_componente, extra_componente,
-    componentepadre_componente, retroalimentacion_componente,
-    fkidtipocomponente_componente, fkidjuego_componente
-) VALUES
-(3, 'nombre', '{"visibilidad": "private", "tipo": "string"}', 1, 'nombre es un atributo de Producto, no de Carrito.', 2, 1),
-(4, 'precio', '{"visibilidad": "private", "tipo": "number"}', 1, 'precio pertenece a Producto porque define su valor monetario.', 2, 1),
-(5, 'stock',  '{"visibilidad": "private", "tipo": "number"}', 1, 'stock indica la cantidad disponible de un Producto.', 2, 1);
-
--- Metodos de Producto (padre = 1)
-
-INSERT INTO public.componente (
-    pkid_componente, nombre_componente, extra_componente,
-    componentepadre_componente, retroalimentacion_componente,
-    fkidtipocomponente_componente, fkidjuego_componente
-) VALUES
-(6, 'aplicarDescuento()', '{"visibilidad": "public", "tipo": "void"}',    1, 'aplicarDescuento() modifica el precio de un Producto.', 3, 1),
-(7, 'estaDisponible()',   '{"visibilidad": "public", "tipo": "boolean"}',  1, 'estaDisponible() consulta el stock del Producto.', 3, 1);
-
--- Atributos de Carrito (padre = 2)
-
-INSERT INTO public.componente (
-    pkid_componente, nombre_componente, extra_componente,
-    componentepadre_componente, retroalimentacion_componente,
-    fkidtipocomponente_componente, fkidjuego_componente
-) VALUES
-(8,  'total',    '{"visibilidad": "private", "tipo": "number"}', 2, 'total es la suma de precios dentro del Carrito.', 2, 1),
-(9,  'cantidad', '{"visibilidad": "private", "tipo": "number"}', 2, 'cantidad indica cuantos productos hay en el Carrito.', 2, 1);
-
--- Metodos de Carrito (padre = 2)
-
-INSERT INTO public.componente (
-    pkid_componente, nombre_componente, extra_componente,
-    componentepadre_componente, retroalimentacion_componente,
-    fkidtipocomponente_componente, fkidjuego_componente
-) VALUES
-(10, 'agregar()', '{"visibilidad": "public", "tipo": "void"}', 2, 'agregar() anade un producto al Carrito.', 3, 1),
-(11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1);
-
-
-
-
 
 --------------------------------------------------------------------------
 --                          SECUENCIAS                            --
@@ -2836,9 +2484,529 @@ FOR EACH ROW EXECUTE FUNCTION func_componente_delete();
 
 
 
+--insert de pruebas
+
+-- ============================================================
+-- 1. universidad
+-- ============================================================
+ 
+INSERT INTO public.universidad (pkcodigoies_universidad, nombre_universidad, tipo_universidad) VALUES
+(1, 'UniversidadAmazonia',    'publica'),
+(2, 'UniAndes',       'privada'),
+(3, 'UniCordoba',     'publica');
+ 
+ 
+-- ============================================================
+-- 2. programa
+-- ============================================================
+ 
+INSERT INTO public.programa (pkcodigo_programa, nombre_programa, fkiduniversidad_programa) VALUES
+(101, 'Ing. Sistemas',   1),
+(102, 'Medicina',        2),
+(103, 'Derecho',         3);
+ 
+ 
+-- ============================================================
+-- 3. perfil
+-- ============================================================
+ 
+INSERT INTO public.perfil (
+    pkcc_perfil, primernombre_perfil, segundonombre_perfil,
+    primerapellido_perfil, segundoapellido_perfil, rol,
+    fechanacimiento_perfil, telefono_perfil, email_perfil,
+    contrasenia_perfil, fkcodigoprograma_perfil
+) VALUES
+(1001, 'Carlos',   'Andres',  'Perez',   'Lopez',   'administrador', '1980-03-15', 3001234567, 'caperez@uni.edu',   'admin123',  101),
+(1002, 'Laura',    'Maria',   'Gomez',   'Torres',  'profesor',      '1985-07-22', 3109876543, 'lagomez@uni.edu',   'prof456',   102),
+(1003, 'Santiago', NULL,      'Ramirez', 'Herrera', 'estudiante',    '2001-11-05', 3207654321, 'saramirez@uni.edu', 'est789',    101),
+(1004, 'Valentina','Paola',   'Rios',    NULL,      'estudiante',    '2002-04-18', 3158887766, 'vrios@uni.edu',     'est321',    102),
+(1005, 'Andres',   'Felipe',  'Mora',    'Castro',  'profesor',      '1990-09-30', 3001122334, 'afmora@uni.edu',    'prof789',   103);
+ 
+ 
+-- ============================================================
+-- 4. curso
+-- ============================================================
+ 
+INSERT INTO public.curso (
+    pkid_curso, nombre_curso, descripcion_curso,
+    imagen_curso, fechacreacion_curso, pfkidadministrador_curso
+) VALUES
+(1, 'Python Basico',   'Introduccion a la programacion con Python.',         'https://img.uni.edu/python.png',   '2024-01-10 08:00:00', 1001),
+(2, 'Bases de Datos',  'Fundamentos de SQL y modelado relacional.',           'https://img.uni.edu/bd.png',       '2024-01-15 09:00:00', 1001),
+(3, 'Redes I',         'Conceptos basicos de redes y telecomunicaciones.',   'https://img.uni.edu/redes.png',    '2024-02-01 10:00:00', 1001);
+ 
+-- ============================================================
+-- 5. CURSO IMPARTIDO
+-- ============================================================
+
+INSERT INTO public.cursoimpartido (pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido) VALUES
+(1, 1002),
+(2, 1005),
+(3, 1002);
+
+ 
+-- ============================================================
+-- 6. grupo
+-- ============================================================
+ 
+INSERT INTO public.grupo (
+    pkid_grupo, fechacreacion_grupo, nombre_grupo,
+    descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
+) VALUES
+(1, '2024-02-05 08:00:00', 'Grupo A',  'Grupo A de Python Basico semestre 2024-1.',   1002, 1),
+(2, '2024-02-05 08:30:00', 'Grupo B',  'Grupo B de Bases de Datos semestre 2024-1.',  1005, 2),
+(3, '2024-02-06 09:00:00', 'Grupo C',  'Grupo C de Redes I semestre 2024-1.',         1002, 3);
+ 
+ 
+-- ============================================================
+-- 7. participación
+-- ============================================================
+ 
+INSERT INTO public.participacion (
+    pfkidestudiante_participacion, pfkidgrupo_participacion,
+    estado_participacion, fecharegistro_participacion,
+    puntuaciontotal_participacion, puntuaciontotalmaterial_participacion,
+    puntuaciontotallink_participacion
+) VALUES
+(1003, 1, TRUE,  '2024-02-10 10:00:00', 85,  50, 35),
+(1004, 2, TRUE,  '2024-02-10 10:30:00', 70,  40, 30),
+(1003, 2, FALSE, '2024-02-11 08:00:00',  0,   0,  0),
+(1004, 3, TRUE,  '2024-02-12 09:00:00', 60,  35, 25);
+ 
+ 
+-- ============================================================
+-- 8. certificado
+-- ============================================================
+ 
+INSERT INTO public.certificado (
+    pfkidestudianteparticipacion_certificado,
+    pfkidgrupoparticipacion_certificado,
+    titulo_certificado, fechaentregado_certificado
+) VALUES
+(1003, 1, 'Cert. Python',  '2024-06-20 12:00:00'),
+(1004, 2, 'Cert. BD',      '2024-06-21 12:00:00'),
+(1004, 3, 'Cert. Redes',   '2024-06-22 12:00:00');
+ 
+ 
+-- ============================================================
+-- 9. modulo
+-- ============================================================
+ 
+INSERT INTO public.modulo (pkid_modulo, numerorefuerzos_modulo, nombre_modulo, fkidcurso_modulo) VALUES
+(1, 3, 'Variables',    1),
+(2, 2, 'Funciones',    1),
+(3, 4, 'Modelo ER',    2),
+(4, 2, 'SQL Basico',   2),
+(5, 3, 'Capa Fisica',  3);
+ 
+ 
+-- ============================================================
+-- 10. refuerzo
+-- ============================================================
+ 
+INSERT INTO public.refuerzo (
+    pkid_refuerzo, explicacion_refuerzo,
+    puntuacion_refuerzo, fkidgrupo_refuerzo, fkidmodulo_refuerzo
+) VALUES
+(1, 'Repaso de tipos de datos en Python y ejemplos practicos.',     10, 1, 1),
+(2, 'Ejercicios de funciones con parametros y retorno.',            15, 1, 2),
+(3, 'Practica de diagramas entidad-relacion con casos reales.',     10, 2, 3),
+(4, 'Consultas SELECT basicas con filtros WHERE y ORDER BY.',       20, 2, 4),
+(5, 'Introduccion a medios de transmision y topologias de red.',    10, 3, 5);
+ 
+ 
+-- ============================================================
+-- 11. enlace
+-- ============================================================
+ 
+INSERT INTO public.enlace (
+    pkid_enlace, tipo_enlace, contenido_enlace,
+    puntuacion_enlace, fkidrefuerzo_enlace
+) VALUES
+(1, 'Video',      'https://youtube.com/python-variables',       5,  1),
+(2, 'Documento',  'https://docs.uni.edu/python-variables.pdf',  5,  1),
+(3, 'Sitio web',  'https://w3schools.com/python/functions',     5,  2),
+(4, 'Video',      'https://youtube.com/modelo-er-intro',        5,  3),
+(5, 'Documento',  'https://docs.uni.edu/sql-basico.pdf',        10, 4),
+(6, 'Sitio web',  'https://cisco.com/redes-basico',             5,  5);
+ 
+ 
+-- ============================================================
+-- 12. ingresorefuerzo
+-- ============================================================
+ 
+INSERT INTO public.ingresorefuerzo (
+    pkid_ingresorefuerzo, puntuacionobtenida_ingresorefuerzo,
+    fecharegistro_ingresorefuerzo,
+    fkidestudianteparticipacion_ingresorefuerzo,
+    fkidgrupoparticipacion_ingresorefuerzo,
+    fkidrefuerzo_ingresorefuerzo
+) VALUES
+(1, 10, '2024-03-05 10:00:00', 1003, 1, 1),
+(2, 12, '2024-03-06 11:00:00', 1003, 1, 2),
+(3,  8, '2024-03-07 09:30:00', 1004, 2, 3),
+(4, 18, '2024-03-08 14:00:00', 1004, 2, 4),
+(5,  7, '2024-03-09 10:00:00', 1004, 3, 5);
+ 
+ 
+-- ============================================================
+-- 13. ingresoenlace
+-- ============================================================
+ 
+INSERT INTO public.ingresoenlace (
+    pkid_ingresoenlace, puntuacionobtenida_ingresoenlace,
+    fecharegistro_ingresoenlace,
+    fkidestudianteparticipacion_ingresoenlace,
+    fkidgrupoparticipacion_ingresoenlace,
+    fkidenlace_ingresoenlace
+) VALUES
+(1, 5,  '2024-03-05 10:30:00', 1003, 1, 1),
+(2, 5,  '2024-03-05 11:00:00', 1003, 1, 2),
+(3, 5,  '2024-03-06 09:00:00', 1004, 2, 4),
+(4, 10, '2024-03-07 14:30:00', 1004, 2, 5),
+(5, 5,  '2024-03-08 10:00:00', 1004, 3, 6);
+ 
+ 
+-- ============================================================
+-- 14. teoria
+-- ============================================================
+ 
+INSERT INTO public.teoria (
+    pkid_teoria, nombre_teoria, contenido_teoria,
+    orden_teoria, fkidmodulo_teoria
+) VALUES
+(1, 'Que es Python',     'Python es un lenguaje interpretado, dinamico y multiparadigma.',          1, 1),
+(2, 'Tipos de datos',    'En Python los tipos principales son int, float, str, bool y list.',       2, 1),
+(3, 'Def y Return',      'Las funciones se definen con def y pueden retornar valores con return.',   1, 2),
+(4, 'Entidades',         'Una entidad representa un objeto del mundo real en el modelo ER.',        1, 3),
+(5, 'Relaciones ER',     'Las relaciones conectan entidades con cardinalidad 1:1, 1:N o N:M.',      2, 3),
+(6, 'SELECT basico',     'SELECT * FROM tabla WHERE condicion ORDER BY columna;',                   1, 4),
+(7, 'Medios fisicos',    'Los medios de transmision pueden ser cableados o inalambricos.',          1, 5);
+ 
+ 
+-- ============================================================
+-- 15. actividad
+-- ============================================================
+ 
+INSERT INTO public.actividad (
+    pkid_actividad, nombre_actividad, url_actividad,
+    disponible_actividad, fkidteoria_actividad
+) VALUES
+(1, 'Quiz Variables',   'https://act.uni.edu/quiz-variables',   TRUE,  2),
+(2, 'Ejerc Funciones',  'https://act.uni.edu/ejerc-funciones',  TRUE,  3),
+(3, 'Quiz Entidades',   'https://act.uni.edu/quiz-entidades',   TRUE,  4),
+(4, 'Taller ER',        'https://act.uni.edu/taller-er',        FALSE, 5),
+(5, 'Quiz SELECT',      'https://act.uni.edu/quiz-select',      TRUE,  6),
+(6, 'Lab Redes',        'https://act.uni.edu/lab-redes',        FALSE, 7);
+ 
+ 
+-- ============================================================
+-- 16. juego
+-- ============================================================
+ 
+INSERT INTO public.juego (
+    pkid_juego, nombre_juego, descripcion_juego,
+    puntuacion_juego, fkidmodulo_juego, fkidgrupo_juego
+) VALUES
+(1, 'Ahorcado Py',    'Adivina el termino de programacion en Python.',   20, 1, 1),
+(2, 'Quiz ER',        'Preguntas de seleccion multiple sobre modelo ER.', 20, 3, 2),
+(3, 'Crucigrama SQL', 'Crucigrama con comandos y clausulas SQL.',         20, 4, 2),
+(4, 'Trivia Redes',   'Preguntas rapidas sobre topologias y protocolos.', 20, 5, 3);
+ 
+ 
+-- ============================================================
+-- 17. juegoelegido
+-- ============================================================
+ 
+INSERT INTO public.juegoelegido (pfkidjuego_juegoelegido, pfkidgrupo_juegoelegido) VALUES
+(1, 1),
+(2, 2),
+(3, 2),
+(4, 3);
+ 
+ 
+-- ============================================================
+-- 18. ingresojuego
+-- ============================================================
+ 
+INSERT INTO public.ingresojuego (
+    pkid_ingresojuego, puntuacionobtenida_ingresojuego,
+    fecharegistro_ingresojuego,
+    fkidestudianteparticipacion_ingresojuego,
+    fkidgrupoparticipacion_ingresojuego,
+    fkidjuegojuegoelegido_ingresojuego,
+    fkidgrupojuegoelegido_ingresojuego
+) VALUES
+(1, 18, '2024-04-10 10:00:00', 1003, 1, 1, 1),
+(2, 15, '2024-04-11 11:00:00', 1004, 2, 2, 2),
+(3, 20, '2024-04-12 09:00:00', 1004, 2, 3, 2),
+(4, 12, '2024-04-13 14:00:00', 1004, 3, 4, 3);
+ 
+ 
+-- ============================================================
+-- 19. tipocomponente
+-- Tipos para diagrama de clases UML (modulo 3 - Modelo ER/UML)
+-- ============================================================
+
+INSERT INTO public.tipocomponente (pkid_tipocomponente, nombre_tipocomponente, fkidmodulo_tipocomponente) VALUES
+(1, 'Clase',    3),
+(2, 'Atributo', 3),
+(3, 'Metodo',   3),
+(4, 'Relacion', 3);
+
+
+-- ============================================================
+-- 20. componente — Juego: "Producto y Carrito"  (pkid_juego = 1)
+--
+-- Jerarquia:
+--   Clases (sin padre):
+--     1  → Producto
+--     2  → Carrito
+--
+--   Atributos de Producto (padre = 1):
+--     3  → nombre    (private, string)
+--     4  → precio    (private, number)
+--     5  → stock     (private, number)
+--
+--   Metodos de Producto (padre = 1):
+--     6  → aplicarDescuento()  (public)
+--     7  → estaDisponible()    (public)
+--
+--   Atributos de Carrito (padre = 2):
+--     8  → total     (private, number)
+--     9  → cantidad  (private, number)
+--
+--   Metodos de Carrito (padre = 2):
+--     10 → agregar() (public)
+--     11 → vaciar()  (public)
+-- ============================================================
+
+-- Clases (raiz, sin padre)
+
+INSERT INTO public.componente (
+    pkid_componente, nombre_componente, extra_componente,
+    componentepadre_componente, retroalimentacion_componente,
+    fkidtipocomponente_componente, fkidjuego_componente
+) VALUES
+(1, 'Producto', '{"x": 100, "y": 150}', NULL, NULL, 1, 1),
+(2, 'Carrito',  '{"x": 500, "y": 150}', NULL, NULL, 1, 1);
+
+-- Atributos de Producto (padre = 1)
+
+INSERT INTO public.componente (
+    pkid_componente, nombre_componente, extra_componente,
+    componentepadre_componente, retroalimentacion_componente,
+    fkidtipocomponente_componente, fkidjuego_componente
+) VALUES
+(3, 'nombre', '{"visibilidad": "private", "tipo": "string"}', 1, 'nombre es un atributo de Producto, no de Carrito.', 2, 1),
+(4, 'precio', '{"visibilidad": "private", "tipo": "number"}', 1, 'precio pertenece a Producto porque define su valor monetario.', 2, 1),
+(5, 'stock',  '{"visibilidad": "private", "tipo": "number"}', 1, 'stock indica la cantidad disponible de un Producto.', 2, 1);
+
+-- Metodos de Producto (padre = 1)
+
+INSERT INTO public.componente (
+    pkid_componente, nombre_componente, extra_componente,
+    componentepadre_componente, retroalimentacion_componente,
+    fkidtipocomponente_componente, fkidjuego_componente
+) VALUES
+(6, 'aplicarDescuento()', '{"visibilidad": "public", "tipo": "void"}',    1, 'aplicarDescuento() modifica el precio de un Producto.', 3, 1),
+(7, 'estaDisponible()',   '{"visibilidad": "public", "tipo": "boolean"}',  1, 'estaDisponible() consulta el stock del Producto.', 3, 1);
+
+-- Atributos de Carrito (padre = 2)
+
+INSERT INTO public.componente (
+    pkid_componente, nombre_componente, extra_componente,
+    componentepadre_componente, retroalimentacion_componente,
+    fkidtipocomponente_componente, fkidjuego_componente
+) VALUES
+(8,  'total',    '{"visibilidad": "private", "tipo": "number"}', 2, 'total es la suma de precios dentro del Carrito.', 2, 1),
+(9,  'cantidad', '{"visibilidad": "private", "tipo": "number"}', 2, 'cantidad indica cuantos productos hay en el Carrito.', 2, 1);
+
+-- Metodos de Carrito (padre = 2)
+
+INSERT INTO public.componente (
+    pkid_componente, nombre_componente, extra_componente,
+    componentepadre_componente, retroalimentacion_componente,
+    fkidtipocomponente_componente, fkidjuego_componente
+) VALUES
+(10, 'agregar()', '{"visibilidad": "public", "tipo": "void"}', 2, 'agregar() anade un producto al Carrito.', 3, 1),
+(11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1);
+
+
+
+
+
+
 ----------------------------------------------------------------
 --               PROCEDIMIENTOS ALMACENADOS
 ----------------------------------------------------------------
+--registrar curso
+
+CREATE OR REPLACE PROCEDURE registrar_curso(
+	IN codigocurso INT,
+    IN descripcion VARCHAR,
+    IN nombrecurso VARCHAR,
+    IN administrador BIGINT,
+    IN imagen TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	--insertar
+	INSERT INTO curso (
+			pkid_curso,
+    		descripcion_curso,
+    		nombre_curso,
+    		pfkidadministrador_curso,
+    		imagen_curso
+	) VALUES (
+		codigocurso, descripcion, nombrecurso, administrador, imagen
+	);
+END;
+$$;
+
+
+--registrar profesor
+
+CREATE OR REPLACE PROCEDURE registrar_profesor(
+	IN cedula BIGINT,
+	IN primernombre VARCHAR, 
+	IN segundonombre VARCHAR, 
+	IN primerapellido VARCHAR,
+	IN segundoapellido VARCHAR,
+	IN rol tipo_perfil,
+	IN fechanacimiento TIMESTAMP,
+	IN telefono BIGINT,
+	IN email VARCHAR,
+	IN contrasenia VARCHAR,
+	IN codigoprograma INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	--insertar
+	INSERT INTO perfil (
+		pkcc_perfil,
+    		primernombre_perfil,
+    		segundonombre_perfil,
+    		primerapellido_perfil,
+    		segundoapellido_perfil,
+    		rol,
+    		fechanacimiento_perfil,
+    		telefono_perfil,
+    		email_perfil,
+    		contrasenia_perfil,
+    		fkcodigoprograma_perfil
+	) VALUES (
+		cedula, primernombre, segundonombre, primerapellido, segundoapellido, rol,
+        fechanacimiento, telefono, email, contrasenia, codigoprograma
+	);
+	
+END;
+$$;
+
+
+
+
+--registrar estudiante
+
+CREATE OR REPLACE PROCEDURE registrar_estudiante(
+	IN cedula BIGINT,
+	IN primernombre VARCHAR, 
+	IN segundonombre VARCHAR, 
+	IN primerapellido VARCHAR,
+	IN segundoapellido VARCHAR,
+	IN rol tipo_perfil,
+	IN fechanacimiento TIMESTAMP,
+	IN telefono BIGINT,
+	IN email VARCHAR,
+	IN contrasenia VARCHAR,
+	IN codigoprograma INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	--insertar
+	INSERT INTO perfil (
+		pkcc_perfil,
+    		primernombre_perfil,
+    		segundonombre_perfil,
+    		primerapellido_perfil,
+    		segundoapellido_perfil,
+    		rol,
+    		fechanacimiento_perfil,
+    		telefono_perfil,
+    		email_perfil,
+    		contrasenia_perfil,
+    		fkcodigoprograma_perfil
+	) VALUES (
+		cedula, primernombre, segundonombre, primerapellido, segundoapellido, rol,
+        fechanacimiento, telefono, email, contrasenia, codigoprograma
+	);
+	
+END;
+$$;
+
+
+
+----------------------------------------------------------------
+--                   FUNCIONES 
+----------------------------------------------------------------
+
+
+CREATE OR REPLACE FUNCTION consultar_actividades(p_idteoría INT)
+RETURNS TABLE (
+    id          INT,
+    nombre      VARCHAR,
+    url         TEXT,
+    disponible  BOOLEAN
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        a.pkid_actividad        AS id,
+        a.nombre_actividad      AS nombre,
+        a.url_actividad         AS url,
+        a.disponible_actividad  AS disponible
+    FROM public.actividad a
+    WHERE a.fkidteoria_actividad = p_idteoría;
+END;
+$$;
+
+
+
+CREATE OR REPLACE FUNCTION editar_actividad(
+    p_id         INT,
+    p_nombre     VARCHAR,
+    p_url        TEXT,
+    p_disponible BOOLEAN
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql AS $$
+BEGIN
+    UPDATE actividad
+    SET nombre_actividad     = p_nombre,
+        url_actividad        = p_url,
+        disponible_actividad = p_disponible
+    WHERE pkid_actividad = p_id;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+CREATE OR REPLACE FUNCTION eliminar_actividad(p_id INT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql AS $$
+BEGIN
+    DELETE FROM actividad WHERE pkid_actividad = p_id;
+    RETURN FOUND;
+END;
+$$;
+
+
 
 
 CREATE OR REPLACE FUNCTION registrar_actividad(
@@ -2861,4 +3029,598 @@ BEGIN
 END;
 $$;
 
-SELECT registrar_actividad('Actividad 1', 'https://...', false, 1);
+
+
+-- registrar un modulo en un curso, retorna el id generado
+CREATE OR REPLACE FUNCTION registrar_modulo(
+    p_nombre  VARCHAR,
+    p_idcurso INT
+)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    nuevo_id INT;
+BEGIN
+    nuevo_id := NEXTVAL('modulo_seq');
+
+    INSERT INTO modulo (pkid_modulo, nombre_modulo, fkidcurso_modulo)
+    VALUES (nuevo_id, p_nombre, p_idcurso);
+
+    RETURN nuevo_id;
+END;
+$$;
+
+
+
+
+CREATE OR REPLACE FUNCTION registrar_teoria(
+    p_nombre   VARCHAR,
+    p_contenido TEXT,
+    p_idmodulo INT
+)
+RETURNS INT
+LANGUAGE plpgsql AS $$
+DECLARE
+    nuevo_id INT;
+BEGIN
+    nuevo_id := NEXTVAL('teoria_seq');
+
+    INSERT INTO teoria (pkid_teoria, nombre_teoria, contenido_teoria, fkidmodulo_teoria)
+    VALUES (nuevo_id, p_nombre, p_contenido, p_idmodulo);
+
+    RETURN nuevo_id;
+END;
+$$;
+
+
+
+
+-- traer los modulos de un curso
+CREATE OR REPLACE FUNCTION consultar_modulos(p_idcurso INT)
+RETURNS TABLE (
+    id     INT,
+    nombre VARCHAR
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        public.modulo.pkid_modulo AS id,
+        public.modulo.nombre_modulo AS nombre
+    FROM public.modulo
+    WHERE public.modulo.fkidcurso_modulo = p_idcurso;
+END;
+$$;
+
+
+
+-- editar el nombre de un modulo
+CREATE OR REPLACE FUNCTION editar_modulo(
+    p_id     INT,
+    p_nombre VARCHAR
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE modulo
+    SET nombre_modulo = p_nombre
+    WHERE pkid_modulo = p_id;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+-- eliminar un modulo
+CREATE OR REPLACE FUNCTION eliminar_modulo(p_id INT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM modulo WHERE pkid_modulo = p_id;
+    RETURN FOUND;
+END;
+$$;
+
+
+
+
+
+CREATE OR REPLACE FUNCTION consultar_teorias(p_idmodulo INT)
+RETURNS TABLE (
+    id       INT,
+    nombre   VARCHAR,
+    contenido TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.pkid_teoria   AS id,
+        t.nombre_teoria AS nombre,
+        t.contenido_teoria AS contenido
+    FROM public.teoria t
+    WHERE t.fkidmodulo_teoria = p_idmodulo
+    ORDER BY t.orden_teoria;
+END;
+$$;
+
+
+
+
+CREATE OR REPLACE FUNCTION editar_teoria(
+    p_id        INT,
+    p_nombre    VARCHAR,
+    p_contenido TEXT
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql AS $$
+BEGIN
+    UPDATE teoria
+    SET nombre_teoria   = p_nombre,
+        contenido_teoria = p_contenido
+    WHERE pkid_teoria = p_id;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+
+CREATE OR REPLACE FUNCTION eliminar_teoria(p_id INT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql AS $$
+BEGIN
+    DELETE FROM teoria WHERE pkid_teoria = p_id;
+    RETURN FOUND;
+END;
+$$;
+
+
+
+
+--traer los cursos registrados en el sistema
+CREATE OR REPLACE FUNCTION consultar_curso()
+RETURNS TABLE (
+    id            INT,
+    nombre        VARCHAR,
+    descripcion   VARCHAR,
+    fechacreacion TIMESTAMP
+)
+AS $$
+BEGIN
+	RETURN QUERY
+	--consulta
+	SELECT
+        public.curso.pkid_curso as id,
+        public.curso.nombre_curso as nombre,
+        public.curso.descripcion_curso as descripcion,
+        public.curso.fechacreacion_curso as fechacreacion
+    FROM public.curso;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+-- Traer todos los datos de los profesores registrados en el sistema
+CREATE OR REPLACE FUNCTION consultar_profe()
+RETURNS TABLE (
+    pkcc              BIGINT,
+    primernombre      VARCHAR,
+    segundonombre     VARCHAR,
+    primerapellido    VARCHAR,
+    segundoapellido   VARCHAR,
+    rol               tipo_perfil,
+    fechanacimiento   TIMESTAMP,
+    telefono          BIGINT,
+    email             VARCHAR,
+    codigoprograma    INT,
+    nombreprograma    VARCHAR,
+    codigouniversidad INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        p.pkcc_perfil              AS pkcc,
+        p.primernombre_perfil      AS primernombre,
+        p.segundonombre_perfil     AS segundonombre,
+        p.primerapellido_perfil    AS primerapellido,
+        p.segundoapellido_perfil   AS segundoapellido,
+        p.rol                      AS rol,
+        p.fechanacimiento_perfil   AS fechanacimiento,
+        p.telefono_perfil          AS telefono,
+        p.email_perfil             AS email,
+        pr.pkcodigo_programa       AS codigoprograma,
+        pr.nombre_programa         AS nombreprograma,
+        pr.fkiduniversidad_programa AS codigouniversidad
+    FROM public.perfil p
+    JOIN public.programa pr ON pr.pkcodigo_programa = p.fkcodigoprograma_perfil
+    WHERE p.rol = 'profesor';
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+
+--editar nombre y descripcion de un curso
+CREATE OR REPLACE FUNCTION editar_curso(
+    p_id INT,
+    p_nombre VARCHAR,
+    p_descripcion VARCHAR
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE curso
+    SET nombre_curso = p_nombre,
+        descripcion_curso = p_descripcion
+    WHERE pkid_curso = p_id;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- =====================================================================
+-- FUNCIÓN: editar_profesor
+-- Descripción: Actualiza los datos de un profesor dado su cédula.
+--              La cédula (pkcc) no se puede modificar.
+-- Parámetros:
+--   p_cedula          BIGINT
+--   p_primernombre    VARCHAR
+--   p_segundonombre   VARCHAR  (nullable)
+--   p_primerapellido  VARCHAR
+--   p_segundoapellido VARCHAR  (nullable)
+--   p_fechanacimiento TIMESTAMP
+--   p_telefono        BIGINT
+--   p_email           VARCHAR
+--   p_contrasenia     VARCHAR  (nullable — NULL conserva la contraseña actual)
+--   p_codigoprograma  INT
+-- Retorna: BOOLEAN → TRUE si se actualizó, FALSE si no existe
+-- =====================================================================
+
+CREATE OR REPLACE FUNCTION editar_profesor(
+    p_cedula          BIGINT,
+    p_primernombre    VARCHAR,
+    p_segundonombre   VARCHAR,
+    p_primerapellido  VARCHAR,
+    p_segundoapellido VARCHAR,
+    p_fechanacimiento TIMESTAMP,
+    p_telefono        BIGINT,
+    p_email           VARCHAR,
+    p_contrasenia     VARCHAR,
+    p_codigoprograma  INT
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE public.perfil SET
+        primernombre_perfil    = p_primernombre,
+        segundonombre_perfil   = p_segundonombre,
+        primerapellido_perfil  = p_primerapellido,
+        segundoapellido_perfil = p_segundoapellido,
+        fechanacimiento_perfil = p_fechanacimiento,
+        telefono_perfil        = p_telefono,
+        email_perfil           = p_email,
+        contrasenia_perfil     = COALESCE(p_contrasenia, contrasenia_perfil),
+        fkcodigoprograma_perfil = p_codigoprograma
+    WHERE pkcc_perfil = p_cedula
+      AND rol = 'profesor';
+
+    RETURN FOUND;
+END;
+$$;
+
+-- Prueba:
+-- SELECT editar_profesor(123456789, 'Juan', 'David', 'Narvaez', 'Sepulveda',
+--   '2000-05-10', 311234567, 'juan@gmail.com', '123456', 103);
+
+
+--eliminar un curso registrado en el sistema
+-- CREATE OR REPLACE FUNCTION eliminar_curso(
+--     id INT
+-- )
+-- RETURNS BOOLEAN
+-- AS $$ 
+-- DECLARE
+--     filas_afectadas INT;
+-- BEGIN
+--     --eliminar
+--     DELETE FROM curso
+--     WHERE pkid_curso = id; 
+    
+--     GET DIAGNOSTICS filas_afectadas = ROW_COUNT;
+
+--     RETURN filas_afectadas > 0;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION eliminar_curso(
+    id INT
+)
+RETURNS BOOLEAN
+AS $$ 
+BEGIN
+    --eliminar
+    DELETE FROM curso
+    WHERE pkid_curso = id; 
+    
+
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- esta funcion se puede mejorar, que cuando no se hayan encontrados registros eliminados, se pueda mostrar un mensaje indicando que no se encontró el profesor con la cédula proporcionada. Esto se puede lograr utilizando RAISE NOTICE o RAISE EXCEPTION para proporcionar retroalimentación al usuario.
+
+
+
+--eliminar un profesor registrado en el sistema
+CREATE OR REPLACE FUNCTION eliminar_profesor(
+    cedula BIGINT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    --eliminar
+    DELETE FROM perfil
+    WHERE pkcc_perfil = cedula AND rol = 'profesor';
+
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- esta funcion se puede mejorar, que cuando no se hayan encontrados registros eliminados, se pueda mostrar un mensaje indicando que no se encontró el profesor con la cédula proporcionada. Esto se puede lograr utilizando RAISE NOTICE o RAISE EXCEPTION para proporcionar retroalimentación al usuario.
+
+
+
+-- =====================================================================
+-- FUNCIÓN: consultar_componentes_juego
+-- Descripción: Retorna todos los componentes de un juego (clases,
+--              atributos y métodos) junto con su tipo y datos extra.
+--              Incluye clase_correcta (componentepadre_componente) que
+--              es usado EXCLUSIVAMENTE por el server action de validación.
+--              El frontend nunca recibe este campo.
+-- Parámetros:
+--   p_id_juego  INT  → ID del juego
+-- Retorna:
+--   id                     INT
+--   nombre                 VARCHAR
+--   extra                  JSON
+--   retroalimentacion      TEXT
+--   nombre_tipo_componente VARCHAR → 'Clase' | 'Atributo' | 'Metodo'
+--   clase_correcta         INT     → padre correcto (solución); NULL para clases
+-- =====================================================================
+
+CREATE OR REPLACE FUNCTION consultar_componentes_juego(p_id_juego INT)
+RETURNS TABLE (
+    id                     INT,
+    nombre                 VARCHAR,
+    extra                  JSON,
+    retroalimentacion      TEXT,
+    nombre_tipo_componente VARCHAR,
+    clase_correcta         INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.pkid_componente               AS id,
+        c.nombre_componente             AS nombre,
+        c.extra_componente              AS extra,
+        c.retroalimentacion_componente  AS retroalimentacion,
+        tc.nombre_tipocomponente        AS nombre_tipo_componente,
+        c.componentepadre_componente    AS clase_correcta
+    FROM public.componente c
+    JOIN public.tipocomponente tc
+        ON tc.pkid_tipocomponente = c.fkidtipocomponente_componente
+    WHERE c.fkidjuego_componente = p_id_juego
+    ORDER BY tc.nombre_tipocomponente, c.pkid_componente;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Prueba:
+-- SELECT * FROM consultar_componentes_juego(1);
+
+
+-- =====================================================================
+-- FUNCIÓN: consultar_juego
+-- Descripción: Retorna la metadata de un juego dado su ID.
+-- Parámetros:
+--   p_id_juego  INT  → ID del juego a consultar
+-- Retorna:
+--   id          INT
+--   nombre      VARCHAR
+--   descripcion VARCHAR
+--   puntuacion  INT
+-- =====================================================================
+
+CREATE OR REPLACE FUNCTION consultar_juego(p_id_juego INT)
+RETURNS TABLE (
+    id          INT,
+    nombre      VARCHAR,
+    descripcion VARCHAR,
+    puntuacion  INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        j.pkid_juego        AS id,
+        j.nombre_juego      AS nombre,
+        j.descripcion_juego AS descripcion,
+        j.puntuacion_juego  AS puntuacion
+    FROM public.juego j
+    WHERE j.pkid_juego = p_id_juego;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Prueba:
+-- SELECT * FROM consultar_juego(1);
+
+
+-- =====================================================================
+-- FUNCIÓN: registrar_ingresojuego
+-- Descripción: Registra el resultado de un intento de juego por parte
+--              de un estudiante. Retorna el ID generado.
+-- Parámetros:
+--   p_id_estudiante BIGINT → CC del estudiante
+--   p_id_grupo      INT    → ID del grupo
+--   p_id_juego      INT    → ID del juego
+--   p_puntaje       INT    → Puntaje obtenido tras la validación
+-- =====================================================================
+
+CREATE OR REPLACE FUNCTION registrar_ingresojuego(
+    p_id_estudiante BIGINT,
+    p_id_grupo      INT,
+    p_id_juego      INT,
+    p_puntaje       INT
+)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    nuevo_id INT;
+BEGIN
+    nuevo_id := NEXTVAL('ingresojuego_seq');
+
+    INSERT INTO public.ingresojuego (
+        pkid_ingresojuego,
+        puntuacionobtenida_ingresojuego,
+        fkidestudianteparticipacion_ingresojuego,
+        fkidgrupoparticipacion_ingresojuego,
+        fkidjuegojuegoelegido_ingresojuego,
+        fkidgrupojuegoelegido_ingresojuego
+    ) VALUES (
+        nuevo_id,
+        p_puntaje,
+        p_id_estudiante,
+        p_id_grupo,
+        p_id_juego,
+        p_id_grupo
+    );
+
+    RETURN nuevo_id;
+END;
+$$;
+
+-- Prueba:
+-- SELECT registrar_ingresojuego(123456, 1, 1, 45);
+
+
+
+
+-- Traer todos los grupos a los que pertenece un estudiante
+CREATE OR REPLACE FUNCTION consultar_grupos_estudiante(p_cedula BIGINT)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechaingreso  TIMESTAMP,
+    nombrecurso   VARCHAR
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        g.pkid_grupo                       AS idgrupo,
+        g.nombre_grupo                     AS nombregrupo,
+        g.descripcion_grupo                AS descripcion,
+        p.fecharegistro_participacion      AS fechaingreso,
+        c.nombre_curso                     AS nombrecurso
+    FROM public.participacion p
+    JOIN public.grupo g
+        ON  g.pkid_grupo = p.pfkidgrupo_participacion
+    JOIN public.cursoimpartido ci
+        ON  ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+    JOIN public.curso c
+        ON  c.pkid_curso = ci.pfkidcurso_cursoimpartido
+    WHERE p.pfkidestudiante_participacion = p_cedula;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+
+--consultarusuario-inicio
+
+CREATE OR REPLACE FUNCTION iniciar_sesion(email VARCHAR, contrasenia VARCHAR)
+RETURNS TABLE (
+	primernombre VARCHAR,
+	correo VARCHAR,
+	rol tipo_perfil,
+	id BIGINT
+)
+AS $$
+BEGIN
+	RETURN QUERY
+	--consulta
+	SELECT  public.perfil.primernombre_perfil as primernombre,
+		public.perfil.email_perfil as correo,
+		public.perfil.rol as rol,
+		public.perfil.pkcc_perfil as id
+	FROM	public.perfil
+	WHERE	public.perfil.email_perfil = email AND
+		public.perfil.contrasenia_perfil = contrasenia;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+-- Retorna todas las universidades con su ID y nombre
+CREATE OR REPLACE FUNCTION retornar_universidad()
+RETURNS TABLE(
+	id          INT,
+	nombre      VARCHAR
+)
+AS $$
+BEGIN
+	RETURN QUERY
+	SELECT
+		u.pkcodigoies_universidad AS id,
+		u.nombre_universidad      AS nombre
+	FROM public.universidad u
+	ORDER BY u.pkcodigoies_universidad ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Retorna todos los programas con su ID, nombre e ID de universidad
+CREATE OR REPLACE FUNCTION retornar_programas()
+RETURNS TABLE (
+	id             INT,
+	nombre         VARCHAR,
+	id_universidad INT
+)
+AS $$
+BEGIN
+	RETURN QUERY
+	SELECT
+		p.pkcodigo_programa          AS id,
+		p.nombre_programa            AS nombre,
+		p.fkiduniversidad_programa   AS id_universidad
+	FROM public.programa p
+	ORDER BY p.pkcodigo_programa ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
