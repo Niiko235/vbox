@@ -57,53 +57,6 @@ function ComponenteItem({ componente }: { componente: ComponenteDisponible }) {
   )
 }
 
-// ─── Drop zone para devolver al side panel ────────────────────────────────────
-
-function SidePanelDropZone() {
-  const { moverAlSidePanel, clases } = useGameStore()
-  const [isDragOver, setIsDragOver] = useState(false)
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-    setIsDragOver(true)
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-
-    const raw = e.dataTransfer.getData(DRAG_MIME)
-    if (!raw) return
-
-    const payload: DragPayload = JSON.parse(raw)
-    if (payload.sourceClaseId === null) return // ya está en el panel
-
-    moverAlSidePanel(payload.componenteId, payload.sourceClaseId)
-  }
-
-  return (
-    <div
-      onDragOver={handleDragOver}
-      onDragLeave={() => setIsDragOver(false)}
-      onDrop={handleDrop}
-      className={`
-        mx-4 mb-3 rounded-lg border-2 border-dashed transition-colors py-3
-        flex items-center justify-center
-        ${
-          isDragOver
-            ? 'border-amber-300 bg-amber-50/40'
-            : 'border-slate-200 bg-transparent'
-        }
-      `}
-    >
-      <span className="text-xs text-slate-400 select-none">
-        {isDragOver ? 'Soltar para devolver' : 'Arrastra aquí para devolver'}
-      </span>
-    </div>
-  )
-}
-
 // ─── Side Panel principal ─────────────────────────────────────────────────────
 
 export function SidePanel() {
@@ -125,17 +78,10 @@ export function SidePanel() {
 
       {/* Lista con scroll */}
       <div className="flex-1 overflow-y-auto">
-
-        {/* Zona para devolver componentes */}
-        <div className="pt-3">
-          <SidePanelDropZone />
-        </div>
-
-        {/* Acordeón de secciones */}
         <Accordion
           type="multiple"
           defaultValue={['atributos', 'metodos']}
-          className="px-4 pb-4"
+          className="px-4 py-4"
         >
           {/* Atributos */}
           <AccordionItem value="atributos" className="border-slate-100">

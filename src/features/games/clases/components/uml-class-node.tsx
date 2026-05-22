@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { Handle, Position } from '@xyflow/react'
-import { Box, Lock, ChevronRight } from 'lucide-react'
+import { Box, Lock, ChevronRight, X } from 'lucide-react'
 
 import { useGameStore, DRAG_MIME, type DragPayload } from '@/features/games/clases/store'
+// DRAG_MIME y DragPayload siguen usándose en los drop handlers del nodo
 import type { ComponenteDisponible } from '@/features/games/clases/actions/get-game-data'
 
 // ─── Paleta de colores por nodo ───────────────────────────────────────────────
@@ -40,75 +41,47 @@ type RowProps<T extends ComponenteDisponible> = {
   claseId: number
 }
 
-function useDraggableRow(componenteId: number, claseId: number) {
-  const [isDragging, setIsDragging] = useState(false)
-
-  const handleDragStart = (e: React.DragEvent) => {
-    const payload: DragPayload = { componenteId, sourceClaseId: claseId }
-    e.dataTransfer.setData(DRAG_MIME, JSON.stringify(payload))
-    e.dataTransfer.effectAllowed = 'move'
-    // Pequeño delay para que React renderice la opacidad antes de tomar el snapshot
-    requestAnimationFrame(() => setIsDragging(true))
-  }
-
-  const handleDragEnd = () => setIsDragging(false)
-
-  return { isDragging, handleDragStart, handleDragEnd }
-}
-
 function AtributoRow({ componente, claseId }: RowProps<ComponenteDisponible>) {
-  const { isDragging, handleDragStart, handleDragEnd } = useDraggableRow(
-    componente.id,
-    claseId
-  )
+  const { moverAlSidePanel } = useGameStore()
   const isPrivate = componente.extra?.visibilidad === 'private'
   const tipo = componente.extra?.tipo ?? 'any'
 
   return (
-    <div
-      draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      className={`
-        flex items-center justify-between px-4 py-2
-        border-b border-slate-100 last:border-b-0
-        cursor-grab active:cursor-grabbing select-none
-        hover:bg-slate-50 transition-colors
-        ${isDragging ? 'opacity-40' : 'opacity-100'}
-      `}
-    >
+    <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors group">
       <div className="flex items-center gap-1.5 min-w-0">
         {isPrivate && <Lock size={11} className="text-slate-400 shrink-0" />}
         <span className="text-sm text-slate-900 truncate">{componente.nombre}</span>
       </div>
-      <span className="text-sm text-slate-400 ml-2 shrink-0">: {tipo}</span>
+      <div className="flex items-center gap-2 ml-2 shrink-0">
+        <span className="text-sm text-slate-400">: {tipo}</span>
+        <button
+          data-nodrag
+          onClick={() => moverAlSidePanel(componente.id, claseId)}
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-red-400"
+        >
+          <X size={13} />
+        </button>
+      </div>
     </div>
   )
 }
 
 function MetodoRow({ componente, claseId }: RowProps<ComponenteDisponible>) {
-  const { isDragging, handleDragStart, handleDragEnd } = useDraggableRow(
-    componente.id,
-    claseId
-  )
+  const { moverAlSidePanel } = useGameStore()
 
   return (
-    <div
-      draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      className={`
-        flex items-center justify-between px-4 py-2
-        border-b border-slate-100 last:border-b-0
-        cursor-grab active:cursor-grabbing select-none
-        hover:bg-slate-50 transition-colors
-        ${isDragging ? 'opacity-40' : 'opacity-100'}
-      `}
-    >
+    <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors group">
       <div className="flex items-center gap-1.5 min-w-0">
         <ChevronRight size={11} className="text-amber-400 shrink-0" />
         <span className="text-sm text-slate-900 truncate">{componente.nombre}()</span>
       </div>
+      <button
+        data-nodrag
+        onClick={() => moverAlSidePanel(componente.id, claseId)}
+        className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-red-400 ml-2 shrink-0"
+      >
+        <X size={13} />
+      </button>
     </div>
   )
 }
