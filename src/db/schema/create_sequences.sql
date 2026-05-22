@@ -1,0 +1,34 @@
+CREATE SEQUENCE IF NOT EXISTS ingresojuego_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+
+-- Secuencia para módulos
+CREATE SEQUENCE IF NOT EXISTS modulo_seq
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 9900
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para teorias
+CREATE SEQUENCE IF NOT EXISTS teoria_seq
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 9900
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para actividades
+CREATE SEQUENCE IF NOT EXISTS actividad_seq
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 9900
+  CACHE 1
+  NO CYCLE;

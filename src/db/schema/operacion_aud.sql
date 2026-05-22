@@ -3,7 +3,7 @@
 -- ============================================================
 
 --insert
-CREATE FUNCTION func_universidad_insert() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION func_universidad_insert() RETURNS TRIGGER
 AS $$
 BEGIN
 	INSERT INTO auditoria.aud_universidad (
@@ -18,13 +18,13 @@ $$
 LANGUAGE plpgsql;
 
 --update new and old
-CREATE FUNCTION func_universidad_update() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION func_universidad_update() RETURNS TRIGGER
 AS $$
 BEGIN
 	INSERT INTO auditoria.aud_universidad (
 		fecha_aud, usuario_aud, operacion_aud,pkcodigoies_universidad, nombre_universidad, tipo_universidad
 	) VALUES (
-		CURRENT_TIMESTAMP,CURRENT_USER,'INSERT',
+		CURRENT_TIMESTAMP,CURRENT_USER,'UPDATE',
 		new.pkcodigoies_universidad, new.nombre_universidad, new.tipo_universidad
 	);
 
@@ -41,7 +41,7 @@ $$
 LANGUAGE plpgsql;
 
 --delete
-CREATE FUNCTION func_universidad_delete() RETURNS TRIGGER
+CREATE OR REPLACE FUNCTION func_universidad_delete() RETURNS TRIGGER
 AS $$
 BEGIN
 	INSERT INTO auditoria.aud_universidad (
@@ -368,7 +368,7 @@ BEGIN
     INSERT INTO auditoria.aud_grupo (
         fecha_aud, usuario_aud, operacion_aud,
         pkid_grupo, fechacreacion_grupo, nombre_grupo,
-        descripcion_grupo, fkidprofesor_grupocursoimpartido, fkidcursocursoimpartido_grupo
+        descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
     ) VALUES (
         CURRENT_TIMESTAMP, CURRENT_USER, 'DELETE',
         OLD.pkid_grupo, OLD.fechacreacion_grupo, OLD.nombre_grupo,

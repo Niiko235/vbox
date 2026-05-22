@@ -11,14 +11,19 @@ AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        g.pkid_grupo                          AS idgrupo,
-        g.nombre_grupo                        AS nombregrupo,
-        g.descripcion_grupo                   AS descripcion,
-        p.fecharegistro_participacion         AS fechaingreso,
-        c.nombre_curso                        AS nombrecurso
+        g.pkid_grupo                       AS idgrupo,
+        g.nombre_grupo                     AS nombregrupo,
+        g.descripcion_grupo                AS descripcion,
+        p.fecharegistro_participacion      AS fechaingreso,
+        c.nombre_curso                     AS nombrecurso
     FROM public.participacion p
-    JOIN public.grupo g  ON g.pkid_grupo   = p.pfkidgrupo_participacion
-    JOIN public.curso c  ON c.pkid_curso   = g.fkidcursocursoimpartido_grupo
+    JOIN public.grupo g
+        ON  g.pkid_grupo = p.pfkidgrupo_participacion
+    JOIN public.cursoimpartido ci
+        ON  ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+    JOIN public.curso c
+        ON  c.pkid_curso = ci.pfkidcurso_cursoimpartido
     WHERE p.pfkidestudiante_participacion = p_cedula;
 END;
 $$

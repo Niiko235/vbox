@@ -259,64 +259,90 @@ INSERT INTO public.ingresojuego (
  
 -- ============================================================
 -- 19. tipocomponente
+-- Tipos para diagrama de clases UML (modulo 3 - Modelo ER/UML)
 -- ============================================================
- 
+
 INSERT INTO public.tipocomponente (pkid_tipocomponente, nombre_tipocomponente, fkidmodulo_tipocomponente) VALUES
-(1, 'Pregunta',      1),
-(2, 'Opcion',        1),
-(3, 'Nivel',         3),
-(4, 'Pista',         4),
-(5, 'Categoria',     5);
- 
- 
+(1, 'Clase',    3),
+(2, 'Atributo', 3),
+(3, 'Metodo',   3),
+(4, 'Relacion', 3);
+
+
 -- ============================================================
--- 20. componente
--- (Relacion recursiva: componentepadre_componente -> pkid_componente)
+-- 20. componente — Juego: "Producto y Carrito"  (pkid_juego = 1)
+--
 -- Jerarquia:
---   Nivel 1 (sin padre):  1, 4, 7
---   Nivel 2 (hijo de 1):  2, 3
---   Nivel 2 (hijo de 4):  5, 6
---   Nivel 2 (hijo de 7):  8, 9
+--   Clases (sin padre):
+--     1  → Producto
+--     2  → Carrito
+--
+--   Atributos de Producto (padre = 1):
+--     3  → nombre    (private, string)
+--     4  → precio    (private, number)
+--     5  → stock     (private, number)
+--
+--   Metodos de Producto (padre = 1):
+--     6  → aplicarDescuento()  (public)
+--     7  → estaDisponible()    (public)
+--
+--   Atributos de Carrito (padre = 2):
+--     8  → total     (private, number)
+--     9  → cantidad  (private, number)
+--
+--   Metodos de Carrito (padre = 2):
+--     10 → agregar() (public)
+--     11 → vaciar()  (public)
 -- ============================================================
- 
--- Padres (raiz)
+
+-- Clases (raiz, sin padre)
 
 INSERT INTO public.componente (
     pkid_componente, nombre_componente, extra_componente,
     componentepadre_componente, retroalimentacion_componente,
     fkidtipocomponente_componente, fkidjuego_componente
 ) VALUES
-(1, 'Pregunta 1',   '{"nivel": 1, "puntaje": 10}', NULL, 'Recuerda los tipos de datos de Python.',    1, 1),
-(4, 'Pregunta 2',   '{"nivel": 1, "puntaje": 10}', NULL, 'Revisa el concepto de entidad en ER.',      1, 2),
-(7, 'Pregunta 3',   '{"nivel": 1, "puntaje": 10}', NULL, 'Consulta los comandos basicos de SQL.',     1, 3);
- 
--- Hijos de Pregunta 1 (pkid=1)
+(1, 'Producto', '{"x": 100, "y": 150}', NULL, NULL, 1, 1),
+(2, 'Carrito',  '{"x": 500, "y": 150}', NULL, NULL, 1, 1);
+
+-- Atributos de Producto (padre = 1)
 
 INSERT INTO public.componente (
     pkid_componente, nombre_componente, extra_componente,
     componentepadre_componente, retroalimentacion_componente,
     fkidtipocomponente_componente, fkidjuego_componente
 ) VALUES
-(2, 'Opcion A',  '{"correcta": true,  "texto": "int, float, str"}', 1, 'Correcto, esos son los tipos basicos.', 2, 1),
-(3, 'Opcion B',  '{"correcta": false, "texto": "class, def, for"}', 1, 'Esos son palabras reservadas, no tipos.', 2, 1);
- 
--- Hijos de Pregunta 2 (pkid=4)
+(3, 'nombre', '{"visibilidad": "private", "tipo": "string"}', 1, 'nombre es un atributo de Producto, no de Carrito.', 2, 1),
+(4, 'precio', '{"visibilidad": "private", "tipo": "number"}', 1, 'precio pertenece a Producto porque define su valor monetario.', 2, 1),
+(5, 'stock',  '{"visibilidad": "private", "tipo": "number"}', 1, 'stock indica la cantidad disponible de un Producto.', 2, 1);
+
+-- Metodos de Producto (padre = 1)
 
 INSERT INTO public.componente (
     pkid_componente, nombre_componente, extra_componente,
     componentepadre_componente, retroalimentacion_componente,
     fkidtipocomponente_componente, fkidjuego_componente
 ) VALUES
-(5, 'Opcion A',  '{"correcta": false, "texto": "Un atributo"}',        4, 'Un atributo describe a la entidad, no la representa.', 2, 2),
-(6, 'Opcion B',  '{"correcta": true,  "texto": "Un objeto del mundo"}', 4, 'Correcto, una entidad representa un objeto real.',      2, 2);
- 
--- Hijos de Pregunta 3 (pkid=7)
+(6, 'aplicarDescuento()', '{"visibilidad": "public", "tipo": "void"}',    1, 'aplicarDescuento() modifica el precio de un Producto.', 3, 1),
+(7, 'estaDisponible()',   '{"visibilidad": "public", "tipo": "boolean"}',  1, 'estaDisponible() consulta el stock del Producto.', 3, 1);
+
+-- Atributos de Carrito (padre = 2)
 
 INSERT INTO public.componente (
     pkid_componente, nombre_componente, extra_componente,
     componentepadre_componente, retroalimentacion_componente,
     fkidtipocomponente_componente, fkidjuego_componente
 ) VALUES
-(8, 'Opcion A',  '{"correcta": true,  "texto": "SELECT * FROM t"}',    7, 'Correcto, esa es la sintaxis basica.',           2, 3),
-(9, 'Opcion B',  '{"correcta": false, "texto": "GET * FROM t"}',       7, 'GET no existe en SQL, es un error de sintaxis.', 2, 3);
+(8,  'total',    '{"visibilidad": "private", "tipo": "number"}', 2, 'total es la suma de precios dentro del Carrito.', 2, 1),
+(9,  'cantidad', '{"visibilidad": "private", "tipo": "number"}', 2, 'cantidad indica cuantos productos hay en el Carrito.', 2, 1);
+
+-- Metodos de Carrito (padre = 2)
+
+INSERT INTO public.componente (
+    pkid_componente, nombre_componente, extra_componente,
+    componentepadre_componente, retroalimentacion_componente,
+    fkidtipocomponente_componente, fkidjuego_componente
+) VALUES
+(10, 'agregar()', '{"visibilidad": "public", "tipo": "void"}', 2, 'agregar() anade un producto al Carrito.', 3, 1),
+(11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1);
 
