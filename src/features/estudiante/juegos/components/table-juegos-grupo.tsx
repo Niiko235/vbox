@@ -60,10 +60,9 @@ export function TableJuegosGrupo({ juegos, idgrupo }: Props) {
               <TableCell className="px-6 py-4 font-medium">
                 {juego.nombrejuego}
               </TableCell>
-              <TableCell className="px-6 py-4">
+              <TableCell className="px-6 py-4 text-center">
                 {juego.mejorpuntaje !== null ? (
                   <span className="inline-flex items-center gap-1 font-semibold text-[#3d1f8c]">
-                    <Trophy size={14} />
                     {juego.mejorpuntaje} pts
                   </span>
                 ) : (
