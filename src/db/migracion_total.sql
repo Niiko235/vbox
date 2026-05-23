@@ -3742,3 +3742,106 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+
+-- Secuencia para grupos
+CREATE SEQUENCE IF NOT EXISTS grupo_seq
+  START WITH 1000
+  INCREMENT BY 1
+  MAXVALUE 99000
+  CACHE 1
+  NO CYCLE;
+
+
+-- Traer los datos de un curso por su id
+CREATE OR REPLACE FUNCTION consultar_curso_por_id(p_idcurso INT)
+RETURNS TABLE (
+    idcurso       INT,
+    nombrecurso   VARCHAR,
+    descripcion   VARCHAR,
+    imagen        TEXT,
+    fechacreacion TIMESTAMP
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.pkid_curso          AS idcurso,
+        c.nombre_curso        AS nombrecurso,
+        c.descripcion_curso   AS descripcion,
+        c.imagen_curso        AS imagen,
+        c.fechacreacion_curso AS fechacreacion
+    FROM public.curso c
+    WHERE c.pkid_curso = p_idcurso;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION consultar_grupos_profesor_curso(p_cedula BIGINT, p_idcurso INT)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechacreacion TIMESTAMP
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        g.pkid_grupo            AS idgrupo,
+        g.nombre_grupo          AS nombregrupo,
+        g.descripcion_grupo     AS descripcion,
+        g.fechacreacion_grupo   AS fechacreacion
+    FROM public.grupo g
+    WHERE g.fkidprofesorcursoimpartido_grupo = p_cedula
+      AND g.fkidcursocursoimpartido_grupo    = p_idcurso;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE FUNCTION crear_grupo(
+    p_nombre      VARCHAR,
+    p_descripcion VARCHAR,
+    p_cedula      BIGINT,
+    p_idcurso     INT
+)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechacreacion TIMESTAMP
+)
+AS $$
+DECLARE
+    v_idgrupo INT := nextval('grupo_seq');
+    v_fecha   TIMESTAMP := NOW();
+BEGIN
+    INSERT INTO public.grupo (
+        pkid_grupo,
+        fechacreacion_grupo,
+        nombre_grupo,
+        descripcion_grupo,
+        fkidprofesorcursoimpartido_grupo,
+        fkidcursocursoimpartido_grupo
+    ) VALUES (
+        v_idgrupo,
+        v_fecha,
+        p_nombre,
+        p_descripcion,
+        p_cedula,
+        p_idcurso
+    );
+
+    RETURN QUERY
+    SELECT
+        v_idgrupo      AS idgrupo,
+        p_nombre       AS nombregrupo,
+        p_descripcion  AS descripcion,
+        v_fecha        AS fechacreacion;
+END;
+$$
+LANGUAGE plpgsql;
+
