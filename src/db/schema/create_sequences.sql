@@ -52,6 +52,15 @@ CREATE SEQUENCE IF NOT EXISTS refuerzo_seq
   NO CYCLE;
 
 
+-- Secuencia para enlaces
+CREATE SEQUENCE IF NOT EXISTS enlace_seq
+  START WITH 100
+  INCREMENT BY 1
+  NO MAXVALUE
+  CACHE 1
+  NO CYCLE;
+
+
 -- Secuencia para juegos
 CREATE SEQUENCE IF NOT EXISTS juego_seq
   START WITH 100
