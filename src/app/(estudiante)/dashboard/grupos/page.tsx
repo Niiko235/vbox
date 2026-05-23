@@ -23,7 +23,7 @@ export default async function GruposPage() {
             Estos son todos los grupos en los que estás inscrito actualmente.
           </p>
         </div>
-        <ListGrupos grupos={grupos} />
+        {sesion && <ListGrupos grupos={grupos} cedula={sesion.cedula} />}
       </div>
     </>
   )

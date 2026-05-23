@@ -2831,7 +2831,7 @@ INSERT INTO public.componente (
 ) VALUES
 (10, 'agregar()', '{"visibilidad": "public", "tipo": "void"}', 2, 'agregar() anade un producto al Carrito.', 3, 1),
 (11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1);
-
+(12, null, '{"claseOrigen": 1, "claseDestino": 2, "tipo": "Agregacion"} ', null, 'Carrito agrega Productos, ya que un Carrito puede contener múltiples Productos pero estos pueden existir de forma independiente.', 4, 1);
 
 
 
@@ -3662,3 +3662,39 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION unirse_grupo(p_cedula BIGINT, p_idgrupo INT)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechaingreso  TIMESTAMP,
+    nombrecurso   VARCHAR
+)
+AS $$
+BEGIN
+    INSERT INTO public.participacion (
+        pfkidestudiante_participacion,
+        pfkidgrupo_participacion
+    ) VALUES (p_cedula, p_idgrupo);
+
+    RETURN QUERY
+    SELECT
+        g.pkid_grupo                       AS idgrupo,
+        g.nombre_grupo                     AS nombregrupo,
+        g.descripcion_grupo                AS descripcion,
+        p.fecharegistro_participacion      AS fechaingreso,
+        c.nombre_curso                     AS nombrecurso
+    FROM public.participacion p
+    JOIN public.grupo g
+        ON  g.pkid_grupo = p.pfkidgrupo_participacion
+    JOIN public.cursoimpartido ci
+        ON  ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+    JOIN public.curso c
+        ON  c.pkid_curso = ci.pfkidcurso_cursoimpartido
+    WHERE p.pfkidestudiante_participacion = p_cedula
+      AND p.pfkidgrupo_participacion      = p_idgrupo;
+END;
+$$
