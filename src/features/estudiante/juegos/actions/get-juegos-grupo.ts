@@ -7,6 +7,7 @@ export type JuegoGrupo = {
   nombrejuego: string
   mejorpuntaje: number | null
   ultimavez: string | null
+  idmodulo: number
 }
 
 export async function getJuegosGrupo(

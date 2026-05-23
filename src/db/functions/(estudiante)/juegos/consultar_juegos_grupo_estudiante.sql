@@ -9,7 +9,8 @@ RETURNS TABLE (
     idjuego      INT,
     nombrejuego  VARCHAR,
     mejorpuntaje INT,
-    ultimavez    TIMESTAMP
+    ultimavez    TIMESTAMP,
+    idmodulo     INT
 )
 AS $$
 BEGIN
@@ -18,7 +19,8 @@ BEGIN
         j.pkid_juego                                 AS idjuego,
         j.nombre_juego                               AS nombrejuego,
         MAX(ij.puntuacionobtenida_ingresojuego)::INT AS mejorpuntaje,
-        MAX(ij.fecharegistro_ingresojuego)           AS ultimavez
+        MAX(ij.fecharegistro_ingresojuego)           AS ultimavez,
+        j.fkidmodulo_juego                           AS idmodulo
     FROM public.participacion p
     JOIN public.juegoelegido je
         ON  je.pfkidgrupo_juegoelegido = p.pfkidgrupo_participacion
@@ -33,11 +35,11 @@ BEGIN
         AND ij.fkidgrupojuegoelegido_ingresojuego       = je.pfkidgrupo_juegoelegido
     WHERE p.pfkidestudiante_participacion = p_cedula
       AND p.pfkidgrupo_participacion      = p_idgrupo
-    GROUP BY j.pkid_juego, j.nombre_juego
+    GROUP BY j.pkid_juego, j.nombre_juego, j.fkidmodulo_juego
     ORDER BY j.pkid_juego;
 END;
 $$
 LANGUAGE plpgsql;
 
 -- Ejecución de prueba
-SELECT * FROM consultar_juegos_grupo_estudiante(1, 123456789);
+SELECT * FROM consultar_juegos_grupo_estudiante(1000, 123456789);
