@@ -3,8 +3,11 @@ import Link from 'next/link'
 import { getGrupoById } from '@/features/profesor/grupos/actions/get-grupo-by-id'
 import { getEstudiantesGrupo } from '@/features/profesor/estudiantes/actions/get-estudiantes-grupo'
 import { getRefuerzosGrupo } from '@/features/profesor/refuerzos/actions/get-refuerzos-grupo'
+import { getJuegosGrupoProfesor } from '@/features/profesor/juegos/actions/get-juegos-grupo-profesor'
+import { getModulos } from '@/features/profesor/refuerzos/actions/get-modulos'
 import { TableEstudiantes } from '@/features/profesor/estudiantes/components/table-estudiantes'
 import { TableRefuerzos } from '@/features/profesor/refuerzos/components/table-refuerzos'
+import { TableJuegosProfesor } from '@/features/profesor/juegos/components/table-juegos-profesor'
 
 type Props = {
   params: Promise<{ idcurso: string; idgrupo: string }>
@@ -44,9 +47,11 @@ export default async function GrupoProfesorPage({ params }: Props) {
     )
   }
 
-  const [estudiantes, refuerzos] = await Promise.all([
+  const [estudiantes, refuerzos, juegos, modulos] = await Promise.all([
     getEstudiantesGrupo(idgrupo),
     getRefuerzosGrupo(idgrupo),
+    getJuegosGrupoProfesor(idgrupo),
+    getModulos(idcurso),
   ])
 
   return (
@@ -80,6 +85,19 @@ export default async function GrupoProfesorPage({ params }: Props) {
             Refuerzos asignados a este grupo.
           </p>
           <TableRefuerzos refuerzos={refuerzos} idgrupo={idgrupo} />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-1">Juegos</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Juegos de diagramas UML asociados a este grupo.
+          </p>
+          <TableJuegosProfesor
+            juegos={juegos}
+            idgrupo={idgrupo}
+            idcurso={idcurso}
+            modulos={modulos}
+          />
         </section>
       </div>
     </>
