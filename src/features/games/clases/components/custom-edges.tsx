@@ -1,6 +1,6 @@
 'use client'
 
-import { BaseEdge, EdgeLabelRenderer, getStraightPath, type EdgeProps } from '@xyflow/react'
+import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { X } from 'lucide-react'
 import { useGameStore } from '@/features/games/clases/store'
 import type { TipoRelacion } from '@/features/games/clases/actions/get-game-data'
@@ -62,8 +62,10 @@ export function RelacionEdge({
   id,
   sourceX,
   sourceY,
+  sourcePosition,
   targetX,
   targetY,
+  targetPosition,
   data,
 }: EdgeProps) {
   const { eliminarRelacion } = useGameStore()
@@ -71,7 +73,15 @@ export function RelacionEdge({
   const estilo = ESTILOS[tipo]
   const marker = MARKER_END[tipo]
 
-  const [edgePath, labelX, labelY] = getStraightPath({ sourceX, sourceY, targetX, targetY })
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+    borderRadius: 12,
+  })
 
   return (
     <>
