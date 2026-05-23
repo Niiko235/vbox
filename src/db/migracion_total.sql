@@ -3737,7 +3737,7 @@ BEGIN
         u.nombre_universidad       AS nombreuniversidad
     FROM public.perfil p
     JOIN public.programa pr ON pr.pkcodigo_programa = p.fkcodigoprograma_perfil
-    JOIN public.universidad u ON u.pkcodigo_universidad = pr.fkiduniversidad_programa
+    JOIN public.universidad u ON u.pkcodigoies_universidad = pr.fkiduniversidad_programa
     WHERE p.pkcc_perfil = cedula;
 END;
 $$
