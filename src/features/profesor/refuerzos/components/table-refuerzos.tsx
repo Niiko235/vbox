@@ -31,7 +31,7 @@ export function TableRefuerzos({ refuerzos: refuerzosIniciales, idgrupo }: Props
   const botonCrear = (
     <div className="flex justify-end">
       <Button asChild className="bg-[#3d1f8c] hover:bg-[#2e1769] text-white">
-        <Link href={`./refuerzos/crear`}>
+        <Link href={`./${idgrupo}/refuerzos/crear`}>
           <Plus size={16} />
           Crear refuerzo
         </Link>
@@ -87,7 +87,7 @@ export function TableRefuerzos({ refuerzos: refuerzosIniciales, idgrupo }: Props
                       size="icon"
                       className="text-[#3d1f8c] hover:text-[#2e1769] hover:bg-violet-50"
                     >
-                      <Link href={`./refuerzos/${r.idrefuerzo}`}>
+                      <Link href={`./${idgrupo}/refuerzos/${r.idrefuerzo}`}>
                         <Pencil size={18} />
                       </Link>
                     </Button>
