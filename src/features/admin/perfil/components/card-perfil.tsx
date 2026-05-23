@@ -37,9 +37,11 @@ export default function CardPerfil({ Perfil }: Props) {
     <div className="space-y-4 p-4 ">
       <div className="space-y-1">
         <h2 className="text-4xl font-bold">Información del Perfil</h2>
-        <p className="text-sm text-gray-500 pt-2">Gestione la información privada</p>
+        <p className="text-sm text-gray-500 pt-2">
+          Gestione la información privada
+        </p>
       </div>
-      <Card className="shadow-xl bg-gradient-to-b from-[#5b21b6] via-[#3d1f8c] to-black">
+      <Card className="shadow-xl bg-gradient-to-b from-[#DDC5F0] via-[#3d1f8c] to-black">
         <CardContent className="pt-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex items-center gap-4 p-4 rounded-xl border bg-white">

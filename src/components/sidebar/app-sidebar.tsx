@@ -48,11 +48,11 @@ export function AppSidebar({ role }: AppSidebarProps) {
       collapsible="icon"
       className="border-r-0"
     >
-      <div className="h-full flex flex-col justify-between bg-gradient-to-b from-white via-[#3d1f8c] to-black">
+      <div className="h-full flex flex-col justify-between bg-gradient-to-b from-[#DDC5F0] via-[#3d1f8c] to-black">
         <SidebarContent className="flex-1">
           <SidebarGroup>
             <SidebarGroupContent>
-              <div className=" rounded-xl p-3 flex items-center gap-3 shadow-md transition-all">
+              <div className="flex items-center gap-3 px-3 py-3">
                 <Image
                   src="/logo.svg"
                   alt="Logo"
@@ -73,7 +73,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <Separator></Separator>
+            <Separator className="bg-white" />
             <SidebarGroupLabel className="text-white text-lg font-bold mt-4 mb-2">
               Contenido
             </SidebarGroupLabel>

@@ -16,7 +16,7 @@ export default async function Page() {
         <div className="space-y-8 p-8">
             <div className="space-y-2">
                 <h1 className="text-4xl font-bold tracking-tight">
-                    Bienvenido al Panel de Administración
+                    Bienvenido al Panel de Estudiante, {perfil.sesion.name}!
                 </h1>
                 <p className="text-muted-foreground text-lg">
                     Aquí puede administrar cursos, certificados y más. 
@@ -34,7 +34,7 @@ export default async function Page() {
                     </p>
                 </div>
             </div>
-            <Card className="shadow-xl bg-[#3d1f8c]">
+            <Card className="shadow-xl bg-gradient-to-b from-[#5b21b6] via-[#3d1f8c] to-black">
                 <CardContent className="pt-6">
                     <div className="grid md:grid-cols-2 gap-6">
                         <div className="flex items-center gap-4 p-4 rounded-xl border bg-white">
