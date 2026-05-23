@@ -1,5 +1,5 @@
-import { User, GraduationCap, Shield, Phone, Mail, Divide, IdCard, UserRoundKey } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { User, Mail, IdCard, UserRoundKey } from "lucide-react"
+import { Card, CardContent} from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { getSesion } from "@/features/auth/actions/get-sesion"
 
@@ -25,7 +25,7 @@ export default async function Page() {
             </div>
             <div className="space-y-2">
                 <Separator />
-                <div className="pt-4">
+                <div className="pt-3">
                     <h2 className="text-2xl font-semibold">
                         Información del Perfil
                     </h2>
@@ -34,7 +34,7 @@ export default async function Page() {
                     </p>
                 </div>
             </div>
-            <Card className="shadow-xl bg-[#3d1f8c]">
+            <Card className="shadow-xl bg-gradient-to-b from-[#5b21b6] via-[#3d1f8c] to-black">
                 <CardContent className="pt-6">
                     <div className="grid md:grid-cols-2 gap-6">
                         <div className="flex items-center gap-4 p-4 rounded-xl border bg-white">
