@@ -50,3 +50,21 @@ CREATE SEQUENCE IF NOT EXISTS refuerzo_seq
   NO MAXVALUE
   CACHE 1
   NO CYCLE;
+
+
+-- Secuencia para juegos
+CREATE SEQUENCE IF NOT EXISTS juego_seq
+  START WITH 100
+  INCREMENT BY 1
+  NO MAXVALUE
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para componentes
+CREATE SEQUENCE IF NOT EXISTS componente_seq
+  START WITH 100
+  INCREMENT BY 1
+  NO MAXVALUE
+  CACHE 1
+  NO CYCLE;
