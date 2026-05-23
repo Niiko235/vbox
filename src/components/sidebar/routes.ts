@@ -3,8 +3,8 @@ import { BookOpenText, ChartLine, CircleUser, LibraryBig, User } from 'lucide-re
 // Rutas del menu para docentes.
 export const rutesTeacher = [
   {
-    title: 'Grupos',
-    url: '/home/grupos',
+    title: 'Mis cursos',
+    url: '/home/cursos',
     icon: BookOpenText,
   },
   {
