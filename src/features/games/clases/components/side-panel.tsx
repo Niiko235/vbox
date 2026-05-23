@@ -1,15 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { Type, Zap } from 'lucide-react'
+import { Type, Zap, ChevronDown } from 'lucide-react'
 
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
-import { useGameStore, DRAG_MIME, type DragPayload } from '@/features/games/clases/store'
+  useGameStore,
+  DRAG_MIME,
+  type DragPayload,
+} from '@/features/games/clases/store'
 import type { ComponenteDisponible } from '@/features/games/clases/actions/get-game-data'
 
 // ─── Ítem arrastrable ─────────────────────────────────────────────────────────
@@ -28,10 +26,7 @@ function ComponenteItem({ componente }: { componente: ComponenteDisponible }) {
   }
 
   const Icon = componente.kind === 'Atributo' ? Type : Zap
-  const subtitulo =
-    componente.kind === 'Atributo' && componente.extra
-      ? `: ${componente.extra.tipo}`
-      : null
+  const subtitulo = componente.extra ? `: ${componente.extra.tipo}` : null
 
   return (
     <div
@@ -57,6 +52,42 @@ function ComponenteItem({ componente }: { componente: ComponenteDisponible }) {
   )
 }
 
+// ─── Sección colapsable simple ────────────────────────────────────────────────
+
+function Seccion({
+  label,
+  icon: Icon,
+  count,
+  children,
+}: {
+  label: string
+  icon: React.ElementType
+  count: number
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(true)
+
+  return (
+    <div className="border-b border-slate-100 last:border-b-0">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+      >
+        <Icon size={14} className="text-slate-400" />
+        {label}
+        <span className="ml-1 text-xs text-slate-400 font-normal">
+          ({count})
+        </span>
+        <ChevronDown
+          size={14}
+          className={`ml-auto text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && <div className="flex flex-col gap-2 pb-3">{children}</div>}
+    </div>
+  )
+}
+
 // ─── Side Panel principal ─────────────────────────────────────────────────────
 
 export function SidePanel() {
@@ -67,7 +98,6 @@ export function SidePanel() {
 
   return (
     <aside className="flex h-full w-80 shrink-0 flex-col border-l border-slate-200 bg-white overflow-hidden">
-
       {/* Header */}
       <div className="border-b border-slate-200 px-4 py-4 shrink-0">
         <h2 className="font-semibold text-slate-900 text-base">Componentes</h2>
@@ -77,64 +107,26 @@ export function SidePanel() {
       </div>
 
       {/* Lista con scroll */}
-      <div className="flex-1 overflow-y-auto">
-        <Accordion
-          type="multiple"
-          defaultValue={['atributos', 'metodos']}
-          className="px-4 py-4"
-        >
-          {/* Atributos */}
-          <AccordionItem value="atributos" className="border-slate-100">
-            <AccordionTrigger className="text-sm font-medium text-slate-700 hover:no-underline py-3">
-              <div className="flex items-center gap-2">
-                <Type size={14} className="text-slate-400" />
-                Atributos
-                <span className="ml-1 text-xs text-slate-400 font-normal">
-                  ({atributos.length})
-                </span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-2">
-              {atributos.length === 0 ? (
-                <p className="text-xs text-slate-400 italic py-2 text-center">
-                  Todos los atributos fueron ubicados
-                </p>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {atributos.map((a) => (
-                    <ComponenteItem key={a.id} componente={a} />
-                  ))}
-                </div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
+      <div className="flex-1 overflow-y-auto px-4 py-2">
+        <Seccion label="Atributos" icon={Type} count={atributos.length}>
+          {atributos.length === 0 ? (
+            <p className="text-xs text-slate-400 italic py-2 text-center">
+              Todos los atributos fueron ubicados
+            </p>
+          ) : (
+            atributos.map((a) => <ComponenteItem key={a.id} componente={a} />)
+          )}
+        </Seccion>
 
-          {/* Métodos */}
-          <AccordionItem value="metodos" className="border-slate-100">
-            <AccordionTrigger className="text-sm font-medium text-slate-700 hover:no-underline py-3">
-              <div className="flex items-center gap-2">
-                <Zap size={14} className="text-slate-400" />
-                Métodos
-                <span className="ml-1 text-xs text-slate-400 font-normal">
-                  ({metodos.length})
-                </span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-2">
-              {metodos.length === 0 ? (
-                <p className="text-xs text-slate-400 italic py-2 text-center">
-                  Todos los métodos fueron ubicados
-                </p>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {metodos.map((m) => (
-                    <ComponenteItem key={m.id} componente={m} />
-                  ))}
-                </div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        <Seccion label="Métodos" icon={Zap} count={metodos.length}>
+          {metodos.length === 0 ? (
+            <p className="text-xs text-slate-400 italic py-2 text-center">
+              Todos los métodos fueron ubicados
+            </p>
+          ) : (
+            metodos.map((m) => <ComponenteItem key={m.id} componente={m} />)
+          )}
+        </Seccion>
       </div>
     </aside>
   )

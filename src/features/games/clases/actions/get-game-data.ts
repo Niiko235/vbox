@@ -117,9 +117,7 @@ export const getGameData = cache(async function getGameData(
         id: c.id,
         nombre: c.nombre,
         kind: c.nombre_tipo_componente,
-        extra: c.nombre_tipo_componente === 'Atributo'
-          ? (c.extra as ExtraAtributo)
-          : null,
+        extra: c.extra as ExtraAtributo | null,
         retroalimentacion: c.retroalimentacion,
       }))
 

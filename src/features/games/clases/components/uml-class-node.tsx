@@ -2,23 +2,75 @@
 
 import { useState } from 'react'
 import { Handle, Position } from '@xyflow/react'
-import { Box, Lock, ChevronRight, X } from 'lucide-react'
+import {
+  Box,
+  Lock,
+  ChevronRight,
+  X,
+  Users,
+  LockOpen,
+  ShieldCheck,
+} from 'lucide-react'
 
-import { useGameStore, DRAG_MIME, type DragPayload } from '@/features/games/clases/store'
+import {
+  useGameStore,
+  DRAG_MIME,
+  type DragPayload,
+} from '@/features/games/clases/store'
 // DRAG_MIME y DragPayload siguen usándose en los drop handlers del nodo
 import type { ComponenteDisponible } from '@/features/games/clases/actions/get-game-data'
 
 // ─── Paleta de colores por nodo ───────────────────────────────────────────────
 
 const PALETA = [
-  { bar: 'bg-amber-300',  border: 'border-amber-300',  bg: 'bg-amber-50/40'  },
-  { bar: 'bg-blue-300',   border: 'border-blue-300',   bg: 'bg-blue-50/40'   },
-  { bar: 'bg-cyan-300',   border: 'border-cyan-300',   bg: 'bg-cyan-50/40'   },
-  { bar: 'bg-emerald-300',border: 'border-emerald-300',bg: 'bg-emerald-50/40'},
-  { bar: 'bg-violet-300', border: 'border-violet-300', bg: 'bg-violet-50/40' },
-  { bar: 'bg-rose-300',   border: 'border-rose-300',   bg: 'bg-rose-50/40'   },
-  { bar: 'bg-fuchsia-300',border: 'border-fuchsia-300',bg: 'bg-fuchsia-50/40'},
-  { bar: 'bg-teal-300',   border: 'border-teal-300',   bg: 'bg-teal-50/40'   },
+  {
+    bar: 'bg-amber-300',
+    border: 'border-amber-300',
+    bg: 'bg-amber-50/40',
+    txt: 'text-amber-400',
+  },
+  {
+    bar: 'bg-blue-300',
+    border: 'border-blue-300',
+    bg: 'bg-blue-50/40',
+    txt: 'text-blue-400',
+  },
+  {
+    bar: 'bg-cyan-300',
+    border: 'border-cyan-300',
+    bg: 'bg-cyan-50/40',
+    txt: 'text-cyan-400',
+  },
+  {
+    bar: 'bg-emerald-300',
+    border: 'border-emerald-300',
+    bg: 'bg-emerald-50/40',
+    txt: 'text-emerald-400',
+  },
+  {
+    bar: 'bg-violet-300',
+    border: 'border-violet-300',
+    bg: 'bg-violet-50/40',
+    txt: 'text-violet-400',
+  },
+  {
+    bar: 'bg-rose-300',
+    border: 'border-rose-300',
+    bg: 'bg-rose-50/40',
+    txt: 'text-rose-400',
+  },
+  {
+    bar: 'bg-fuchsia-300',
+    border: 'border-fuchsia-300',
+    bg: 'bg-fuchsia-50/40',
+    txt: 'text-fuchsia-400',
+  },
+  {
+    bar: 'bg-teal-300',
+    border: 'border-teal-300',
+    bg: 'bg-teal-50/40',
+    txt: 'text-teal-400',
+  },
 ]
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -39,18 +91,33 @@ type Props = {
 type RowProps<T extends ComponenteDisponible> = {
   componente: T
   claseId: number
+  color: string
 }
 
-function AtributoRow({ componente, claseId }: RowProps<ComponenteDisponible>) {
+function AtributoRow({
+  componente,
+  claseId,
+  color,
+}: RowProps<ComponenteDisponible>) {
   const { moverAlSidePanel } = useGameStore()
-  const isPrivate = componente.extra?.visibilidad === 'private'
+  const visibility = componente.extra?.visibilidad
   const tipo = componente.extra?.tipo ?? 'any'
 
   return (
     <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors group">
       <div className="flex items-center gap-1.5 min-w-0">
-        {isPrivate && <Lock size={11} className="text-slate-400 shrink-0" />}
-        <span className="text-sm text-slate-900 truncate">{componente.nombre}</span>
+        {visibility === 'private' && (
+          <Lock size={11} className={`${color} shrink-0`} />
+        )}
+        {visibility === 'public' && (
+          <Users size={11} className={`${color} shrink-0`} />
+        )}
+        {visibility === 'protected' && (
+          <ShieldCheck size={11} className={`${color} shrink-0`} />
+        )}
+        <span className="text-sm text-slate-900 truncate">
+          {componente.nombre}
+        </span>
       </div>
       <div className="flex items-center gap-2 ml-2 shrink-0">
         <span className="text-sm text-slate-400">: {tipo}</span>
@@ -66,22 +133,37 @@ function AtributoRow({ componente, claseId }: RowProps<ComponenteDisponible>) {
   )
 }
 
-function MetodoRow({ componente, claseId }: RowProps<ComponenteDisponible>) {
+function MetodoRow({ componente, claseId, color }: RowProps<ComponenteDisponible>) {
   const { moverAlSidePanel } = useGameStore()
+  const visibility = componente.extra?.visibilidad
+  const tipo = componente.extra?.tipo
 
   return (
     <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors group">
       <div className="flex items-center gap-1.5 min-w-0">
-        <ChevronRight size={11} className="text-amber-400 shrink-0" />
-        <span className="text-sm text-slate-900 truncate">{componente.nombre}()</span>
+        {visibility === 'private' && (
+          <Lock size={11} className={`${color} shrink-0`} />
+        )}
+        {visibility === 'public' && (
+          <Users size={11} className={`${color} shrink-0`} />
+        )}
+        {visibility === 'protected' && (
+          <ShieldCheck size={11} className={`${color} shrink-0`} />
+        )}
+        <span className="text-sm text-slate-900 truncate">
+          {componente.nombre}
+        </span>
       </div>
-      <button
-        data-nodrag
-        onClick={() => moverAlSidePanel(componente.id, claseId)}
-        className="p-1 rounded text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors ml-2 shrink-0"
-      >
-        <X size={13} />
-      </button>
+      <div>
+        <span className="text-sm text-slate-400">: {tipo}</span>
+        <button
+          data-nodrag
+          onClick={() => moverAlSidePanel(componente.id, claseId)}
+          className="p-1 rounded text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors ml-2 shrink-0"
+        >
+          <X size={13} />
+        </button>
+      </div>
     </div>
   )
 }
@@ -97,10 +179,7 @@ export function UMLClassNode({ data }: Props) {
 
   // ── Handlers genéricos de drop zone ────────────────────────────────────────
 
-  const handleDragOver = (
-    e: React.DragEvent,
-    setter: (v: boolean) => void
-  ) => {
+  const handleDragOver = (e: React.DragEvent, setter: (v: boolean) => void) => {
     e.preventDefault()
     e.stopPropagation()
     e.dataTransfer.dropEffect = 'move'
@@ -156,13 +235,16 @@ export function UMLClassNode({ data }: Props) {
       moverAlCanvas(payload.componenteId, data.claseId)
     } else if (payload.sourceClaseId !== data.claseId) {
       // Viene de otra clase
-      moverEntreClases(payload.componenteId, payload.sourceClaseId, data.claseId)
+      moverEntreClases(
+        payload.componenteId,
+        payload.sourceClaseId,
+        data.claseId
+      )
     }
   }
 
   return (
     <div className="min-w-65 max-w-75 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-
       {/* Barra superior decorativa */}
       <div className={`h-1.5 w-full ${color.bar} rounded-t-xl`} />
 
@@ -192,7 +274,12 @@ export function UMLClassNode({ data }: Props) {
           </p>
         )}
         {data.atributos.map((attr) => (
-          <AtributoRow key={attr.id} componente={attr} claseId={data.claseId} />
+          <AtributoRow
+            key={attr.id}
+            componente={attr}
+            claseId={data.claseId}
+            color={color.txt}
+          />
         ))}
       </div>
 
@@ -221,7 +308,12 @@ export function UMLClassNode({ data }: Props) {
           </p>
         )}
         {data.metodos.map((met) => (
-          <MetodoRow key={met.id} componente={met} claseId={data.claseId} />
+          <MetodoRow
+            key={met.id}
+            componente={met}
+            claseId={data.claseId}
+            color={color.txt}
+          />
         ))}
       </div>
 
