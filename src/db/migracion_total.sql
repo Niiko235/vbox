@@ -1,10 +1,31 @@
 -------------------------------------------------------------------
+--                      BASE DE DATOS.                           --
+-------------------------------------------------------------------
+
+CREATE DATABASE vbox;
+--seleccionar base de datos
+\c vbox;
+
+-------------------------------------------------------------------
+--                      SCHEMAS                                  --
+-------------------------------------------------------------------
+
+--crear esquema publico donde irán las tablas de producción
+CREATE SCHEMA IF NOT EXISTS public;
+--crear esquema de auditorías para la tabla de auditorias
+CREATE SCHEMA IF NOT EXISTS auditoria;
+
+
+
+-------------------------------------------------------------------
 --                      TIPOS ENUMERADOS                         --
 -------------------------------------------------------------------
 CREATE TYPE tipo_universidad AS ENUM ('privada', 'publica');
 CREATE TYPE tipo_enlace AS ENUM ('Sitio web', 'Documento', 'Video', 'Otro');
 CREATE TYPE tipooperacion_auditoria AS ENUM ('INSERT', 'UPDATE', 'DELETE');
 CREATE TYPE tipo_perfil AS ENUM ('estudiante', 'profesor', 'administrador');
+
+
 
 -------------------------------------------------------------------
 --                         TABLAS PRINCIPALES                    --
@@ -58,7 +79,6 @@ CREATE TABLE public.cursoimpartido(
     pfkidcurso_cursoimpartido INT NOT NULL,
     pfkidprofesor_cursoimpartido BIGINT NOT NULL
 );
-
 
 CREATE TABLE public.participacion (
     pfkidestudiante_participacion BIGINT NOT NULL,
@@ -255,6 +275,22 @@ ALTER TABLE public.grupo
     REFERENCES
         public.cursoimpartido (pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido);
 
+ALTER TABLE public.cursoimpartido 
+    ADD CONSTRAINT 
+        fk_cursoimpartido_curso 
+    FOREIGN KEY 
+        (pfkidcurso_cursoimpartido) 
+    REFERENCES 
+        public.curso (pkid_curso);
+
+ALTER TABLE public.cursoimpartido 
+    ADD CONSTRAINT 
+        fk_cursoimpartido_profesor 
+    FOREIGN KEY 
+        (pfkidprofesor_cursoimpartido) 
+    REFERENCES 
+        public.perfil (pkcc_perfil);
+
 ALTER TABLE public.participacion 
     ADD CONSTRAINT 
         fk_participacion_estudiante 
@@ -440,10 +476,9 @@ ALTER TABLE public.componente
         public.componente (pkid_componente);
 
 
-        -------------------------------------------------------------------
---                          AUDITORÍA                            --
 -------------------------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS auditoria;
+--                          TABLES AUDITORÍA                     --
+-------------------------------------------------------------------
 
 CREATE TABLE auditoria.aud_universidad (
     fecha_aud TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -668,54 +703,9 @@ CREATE TABLE auditoria.aud_componente (
     fkidjuego_componente INT
 );
 
---------------------------------------------------------------------------
---                          SECUENCIAS                            --
---------------------------------------------------------------------------
-
-
-
-CREATE SEQUENCE IF NOT EXISTS ingresojuego_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-
--- Secuencia para módulos
-CREATE SEQUENCE IF NOT EXISTS modulo_seq
-  START WITH 1
-  INCREMENT BY 1
-  MAXVALUE 9900
-  CACHE 1
-  NO CYCLE;
-
-
--- Secuencia para teorias
-CREATE SEQUENCE IF NOT EXISTS teoria_seq
-  START WITH 1
-  INCREMENT BY 1
-  MAXVALUE 9900
-  CACHE 1
-  NO CYCLE;
-
-
--- Secuencia para actividades
-CREATE SEQUENCE IF NOT EXISTS actividad_seq
-  START WITH 1
-  INCREMENT BY 1
-  MAXVALUE 9900
-  CACHE 1
-  NO CYCLE;
-
-
-
---------------------------------------------------------------------------
---                          TRIGGERS                              --
---------------------------------------------------------------------------
-
-
+-------------------------------------------------------------------
+--                      FUNCIONES  AUDITORIA                     --
+-------------------------------------------------------------------
 
 -- ============================================================
 -- 1. auditoria.aud_universidad
@@ -2097,10 +2087,12 @@ $$ LANGUAGE plpgsql;
 
 
 
-
--- ============================================================
+-------------------------------------------------------------------
+--                      TRIGGERS  AUDITORIA                      --
+-------------------------------------------------------------------
+-- 
 -- 1. auditoria.aud_universidad
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_universidad_insert
@@ -2120,9 +2112,9 @@ BEFORE DELETE ON public.universidad
 FOR EACH ROW
 EXECUTE FUNCTION func_universidad_delete();
 
--- ============================================================
+-- 
 -- 2. auditoria.aud_programa
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_programa_insert
@@ -2139,9 +2131,9 @@ CREATE TRIGGER tr_programa_delete
 BEFORE DELETE ON public.programa
 FOR EACH ROW EXECUTE FUNCTION func_programa_delete();
 
--- ============================================================
+-- 
 -- 3. auditoria.aud_perfil
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_perfil_insert
@@ -2158,9 +2150,9 @@ CREATE TRIGGER tr_perfil_delete
 BEFORE DELETE ON public.perfil
 FOR EACH ROW EXECUTE FUNCTION func_perfil_delete();
 
--- ============================================================
+-- 
 -- 4. auditoria.aud_curso
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_curso_insert
@@ -2177,9 +2169,9 @@ CREATE TRIGGER tr_curso_delete
 BEFORE DELETE ON public.curso
 FOR EACH ROW EXECUTE FUNCTION func_curso_delete();
 
--- ============================================================
+-- 
 -- 5. auditoria.aud_cursoimpartido
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_cursoimpartido_insert
@@ -2197,9 +2189,9 @@ BEFORE DELETE ON public.cursoimpartido
 FOR EACH ROW EXECUTE FUNCTION func_cursoimpartido_delete();
 
 
--- ============================================================
+-- 
 -- 6. auditoria.aud_grupo
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_grupo_insert
@@ -2216,9 +2208,9 @@ CREATE TRIGGER tr_grupo_delete
 BEFORE DELETE ON public.grupo
 FOR EACH ROW EXECUTE FUNCTION func_grupo_delete();
 
--- ============================================================
+-- 
 -- 7. auditoria.aud_participacion
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_participacion_insert
@@ -2235,9 +2227,9 @@ CREATE TRIGGER tr_participacion_delete
 BEFORE DELETE ON public.participacion
 FOR EACH ROW EXECUTE FUNCTION func_participacion_delete();
 
--- ============================================================
+-- 
 -- 8. auditoria.aud_certificado
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_certificado_insert
@@ -2254,9 +2246,9 @@ CREATE TRIGGER tr_certificado_delete
 BEFORE DELETE ON public.certificado
 FOR EACH ROW EXECUTE FUNCTION func_certificado_delete();
 
--- ============================================================
+-- 
 -- 9. auditoria.aud_refuerzo
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_refuerzo_insert
@@ -2273,9 +2265,9 @@ CREATE TRIGGER tr_refuerzo_delete
 BEFORE DELETE ON public.refuerzo
 FOR EACH ROW EXECUTE FUNCTION func_refuerzo_delete();
 
--- ============================================================
+-- 
 -- 10. auditoria.aud_enlace
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_enlace_insert
@@ -2292,9 +2284,9 @@ CREATE TRIGGER tr_enlace_delete
 BEFORE DELETE ON public.enlace
 FOR EACH ROW EXECUTE FUNCTION func_enlace_delete();
 
--- ============================================================
+-- 
 -- 11. auditoria.aud_ingresorefuerzo
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_ingresorefuerzo_insert
@@ -2311,9 +2303,9 @@ CREATE TRIGGER tr_ingresorefuerzo_delete
 BEFORE DELETE ON public.ingresorefuerzo
 FOR EACH ROW EXECUTE FUNCTION func_ingresorefuerzo_delete();
 
--- ============================================================
+-- 
 -- 12. auditoria.aud_ingresoenlace
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_ingresoenlace_insert
@@ -2330,9 +2322,9 @@ CREATE TRIGGER tr_ingresoenlace_delete
 BEFORE DELETE ON public.ingresoenlace
 FOR EACH ROW EXECUTE FUNCTION func_ingresoenlace_delete();
 
--- ============================================================
+-- 
 -- 13. auditoria.aud_modulo
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_modulo_insert
@@ -2349,9 +2341,9 @@ CREATE TRIGGER tr_modulo_delete
 BEFORE DELETE ON public.modulo
 FOR EACH ROW EXECUTE FUNCTION func_modulo_delete();
 
--- ============================================================
+-- 
 -- 14. auditoria.aud_teoria
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_teoria_insert
@@ -2368,9 +2360,9 @@ CREATE TRIGGER tr_teoria_delete
 BEFORE DELETE ON public.teoria
 FOR EACH ROW EXECUTE FUNCTION func_teoria_delete();
 
--- ============================================================
+-- 
 -- 15. auditoria.aud_actividad
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_actividad_insert
@@ -2387,9 +2379,9 @@ CREATE TRIGGER tr_actividad_delete
 BEFORE DELETE ON public.actividad
 FOR EACH ROW EXECUTE FUNCTION func_actividad_delete();
 
--- ============================================================
+-- 
 -- 16. auditoria.aud_juego
--- ============================================================
+-- 
 
 --insert 
 CREATE TRIGGER tr_juego_insert
@@ -2406,9 +2398,9 @@ CREATE TRIGGER tr_juego_delete
 BEFORE DELETE ON public.juego
 FOR EACH ROW EXECUTE FUNCTION func_juego_delete();
 
--- ============================================================
+-- 
 -- 17. auditoria.aud_juegoelegido
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_juegoelegido_insert
@@ -2425,9 +2417,9 @@ CREATE TRIGGER tr_juegoelegido_delete
 BEFORE DELETE ON public.juegoelegido
 FOR EACH ROW EXECUTE FUNCTION func_juegoelegido_delete();
 
--- ============================================================
+-- 
 -- 18. auditoria.aud_ingresojuego
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_ingresojuego_insert
@@ -2444,9 +2436,9 @@ CREATE TRIGGER tr_ingresojuego_delete
 BEFORE DELETE ON public.ingresojuego
 FOR EACH ROW EXECUTE FUNCTION func_ingresojuego_delete();
 
--- ============================================================
+-- 
 -- 19. auditoria.aud_tipocomponente
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_tipocomponente_insert
@@ -2463,9 +2455,9 @@ CREATE TRIGGER tr_tipocomponente_delete
 BEFORE DELETE ON public.tipocomponente
 FOR EACH ROW EXECUTE FUNCTION func_tipocomponente_delete();
 
--- ============================================================
+-- 
 -- 20. auditoria.aud_componente
--- ============================================================
+-- 
 
 --insert
 CREATE TRIGGER tr_componente_insert
@@ -2483,29 +2475,29 @@ BEFORE DELETE ON public.componente
 FOR EACH ROW EXECUTE FUNCTION func_componente_delete();
 
 
+-------------------------------------------------------------------
+--                         INSERCIONES.                          --
+-------------------------------------------------------------------
 
---insert de pruebas
 
 -- ============================================================
 -- 1. universidad
 -- ============================================================
  
 INSERT INTO public.universidad (pkcodigoies_universidad, nombre_universidad, tipo_universidad) VALUES
-(1, 'UniversidadAmazonia',    'publica'),
+(1, 'Universidad Amazonia',    'publica'),
 (2, 'UniAndes',       'privada'),
 (3, 'UniCordoba',     'publica');
- 
- 
+
 -- ============================================================
 -- 2. programa
 -- ============================================================
  
 INSERT INTO public.programa (pkcodigo_programa, nombre_programa, fkiduniversidad_programa) VALUES
 (101, 'Ing. Sistemas',   1),
-(102, 'Medicina',        2),
+(102, 'Contaduría',        2),
 (103, 'Derecho',         3);
- 
- 
+
 -- ============================================================
 -- 3. perfil
 -- ============================================================
@@ -2522,7 +2514,6 @@ INSERT INTO public.perfil (
 (1004, 'Valentina','Paola',   'Rios',    NULL,      'estudiante',    '2002-04-18', 3158887766, 'vrios@uni.edu',     'est321',    102),
 (1005, 'Andres',   'Felipe',  'Mora',    'Castro',  'profesor',      '1990-09-30', 3001122334, 'afmora@uni.edu',    'prof789',   103);
  
- 
 -- ============================================================
 -- 4. curso
 -- ============================================================
@@ -2531,9 +2522,7 @@ INSERT INTO public.curso (
     pkid_curso, nombre_curso, descripcion_curso,
     imagen_curso, fechacreacion_curso, pfkidadministrador_curso
 ) VALUES
-(1, 'Python Basico',   'Introduccion a la programacion con Python.',         'https://img.uni.edu/python.png',   '2024-01-10 08:00:00', 1001),
-(2, 'Bases de Datos',  'Fundamentos de SQL y modelado relacional.',           'https://img.uni.edu/bd.png',       '2024-01-15 09:00:00', 1001),
-(3, 'Redes I',         'Conceptos basicos de redes y telecomunicaciones.',   'https://img.uni.edu/redes.png',    '2024-02-01 10:00:00', 1001);
+(1, 'Curso UML',   'Aprende sobre los conceptos UML',         'https://img.uni.edu/python.png',   '2024-01-10 08:00:00', 1001);
  
 -- ============================================================
 -- 5. CURSO IMPARTIDO
@@ -2541,245 +2530,54 @@ INSERT INTO public.curso (
 
 INSERT INTO public.cursoimpartido (pfkidcurso_cursoimpartido, pfkidprofesor_cursoimpartido) VALUES
 (1, 1002),
-(2, 1005),
-(3, 1002);
+(1, 1005);
 
- 
 -- ============================================================
--- 6. grupo
--- ============================================================
- 
-INSERT INTO public.grupo (
-    pkid_grupo, fechacreacion_grupo, nombre_grupo,
-    descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
-) VALUES
-(1, '2024-02-05 08:00:00', 'Grupo A',  'Grupo A de Python Basico semestre 2024-1.',   1002, 1),
-(2, '2024-02-05 08:30:00', 'Grupo B',  'Grupo B de Bases de Datos semestre 2024-1.',  1005, 2),
-(3, '2024-02-06 09:00:00', 'Grupo C',  'Grupo C de Redes I semestre 2024-1.',         1002, 3);
- 
- 
--- ============================================================
--- 7. participación
--- ============================================================
- 
-INSERT INTO public.participacion (
-    pfkidestudiante_participacion, pfkidgrupo_participacion,
-    estado_participacion, fecharegistro_participacion,
-    puntuaciontotal_participacion, puntuaciontotalmaterial_participacion,
-    puntuaciontotallink_participacion
-) VALUES
-(1003, 1, TRUE,  '2024-02-10 10:00:00', 85,  50, 35),
-(1004, 2, TRUE,  '2024-02-10 10:30:00', 70,  40, 30),
-(1003, 2, FALSE, '2024-02-11 08:00:00',  0,   0,  0),
-(1004, 3, TRUE,  '2024-02-12 09:00:00', 60,  35, 25);
- 
- 
--- ============================================================
--- 8. certificado
--- ============================================================
- 
-INSERT INTO public.certificado (
-    pfkidestudianteparticipacion_certificado,
-    pfkidgrupoparticipacion_certificado,
-    titulo_certificado, fechaentregado_certificado
-) VALUES
-(1003, 1, 'Cert. Python',  '2024-06-20 12:00:00'),
-(1004, 2, 'Cert. BD',      '2024-06-21 12:00:00'),
-(1004, 3, 'Cert. Redes',   '2024-06-22 12:00:00');
- 
- 
--- ============================================================
--- 9. modulo
+-- 6. modulo
 -- ============================================================
  
 INSERT INTO public.modulo (pkid_modulo, numerorefuerzos_modulo, nombre_modulo, fkidcurso_modulo) VALUES
-(1, 3, 'Variables',    1),
-(2, 2, 'Funciones',    1),
-(3, 4, 'Modelo ER',    2),
-(4, 2, 'SQL Basico',   2),
-(5, 3, 'Capa Fisica',  3);
- 
- 
+(1, 3, 'Diagrama Clases',    1);
+
 -- ============================================================
--- 10. refuerzo
--- ============================================================
- 
-INSERT INTO public.refuerzo (
-    pkid_refuerzo, explicacion_refuerzo,
-    puntuacion_refuerzo, fkidgrupo_refuerzo, fkidmodulo_refuerzo
-) VALUES
-(1, 'Repaso de tipos de datos en Python y ejemplos practicos.',     10, 1, 1),
-(2, 'Ejercicios de funciones con parametros y retorno.',            15, 1, 2),
-(3, 'Practica de diagramas entidad-relacion con casos reales.',     10, 2, 3),
-(4, 'Consultas SELECT basicas con filtros WHERE y ORDER BY.',       20, 2, 4),
-(5, 'Introduccion a medios de transmision y topologias de red.',    10, 3, 5);
- 
- 
--- ============================================================
--- 11. enlace
--- ============================================================
- 
-INSERT INTO public.enlace (
-    pkid_enlace, tipo_enlace, contenido_enlace,
-    puntuacion_enlace, fkidrefuerzo_enlace
-) VALUES
-(1, 'Video',      'https://youtube.com/python-variables',       5,  1),
-(2, 'Documento',  'https://docs.uni.edu/python-variables.pdf',  5,  1),
-(3, 'Sitio web',  'https://w3schools.com/python/functions',     5,  2),
-(4, 'Video',      'https://youtube.com/modelo-er-intro',        5,  3),
-(5, 'Documento',  'https://docs.uni.edu/sql-basico.pdf',        10, 4),
-(6, 'Sitio web',  'https://cisco.com/redes-basico',             5,  5);
- 
- 
--- ============================================================
--- 12. ingresorefuerzo
--- ============================================================
- 
-INSERT INTO public.ingresorefuerzo (
-    pkid_ingresorefuerzo, puntuacionobtenida_ingresorefuerzo,
-    fecharegistro_ingresorefuerzo,
-    fkidestudianteparticipacion_ingresorefuerzo,
-    fkidgrupoparticipacion_ingresorefuerzo,
-    fkidrefuerzo_ingresorefuerzo
-) VALUES
-(1, 10, '2024-03-05 10:00:00', 1003, 1, 1),
-(2, 12, '2024-03-06 11:00:00', 1003, 1, 2),
-(3,  8, '2024-03-07 09:30:00', 1004, 2, 3),
-(4, 18, '2024-03-08 14:00:00', 1004, 2, 4),
-(5,  7, '2024-03-09 10:00:00', 1004, 3, 5);
- 
- 
--- ============================================================
--- 13. ingresoenlace
--- ============================================================
- 
-INSERT INTO public.ingresoenlace (
-    pkid_ingresoenlace, puntuacionobtenida_ingresoenlace,
-    fecharegistro_ingresoenlace,
-    fkidestudianteparticipacion_ingresoenlace,
-    fkidgrupoparticipacion_ingresoenlace,
-    fkidenlace_ingresoenlace
-) VALUES
-(1, 5,  '2024-03-05 10:30:00', 1003, 1, 1),
-(2, 5,  '2024-03-05 11:00:00', 1003, 1, 2),
-(3, 5,  '2024-03-06 09:00:00', 1004, 2, 4),
-(4, 10, '2024-03-07 14:30:00', 1004, 2, 5),
-(5, 5,  '2024-03-08 10:00:00', 1004, 3, 6);
- 
- 
--- ============================================================
--- 14. teoria
+-- 7. teoria
 -- ============================================================
  
 INSERT INTO public.teoria (
     pkid_teoria, nombre_teoria, contenido_teoria,
     orden_teoria, fkidmodulo_teoria
 ) VALUES
-(1, 'Que es Python',     'Python es un lenguaje interpretado, dinamico y multiparadigma.',          1, 1),
-(2, 'Tipos de datos',    'En Python los tipos principales son int, float, str, bool y list.',       2, 1),
-(3, 'Def y Return',      'Las funciones se definen con def y pueden retornar valores con return.',   1, 2),
-(4, 'Entidades',         'Una entidad representa un objeto del mundo real en el modelo ER.',        1, 3),
-(5, 'Relaciones ER',     'Las relaciones conectan entidades con cardinalidad 1:1, 1:N o N:M.',      2, 3),
-(6, 'SELECT basico',     'SELECT * FROM tabla WHERE condicion ORDER BY columna;',                   1, 4),
-(7, 'Medios fisicos',    'Los medios de transmision pueden ser cableados o inalambricos.',          1, 5);
- 
- 
+(1, 'Que es una Clase' ,     ' Es una plantilla o "molde" que define las características y comportamientos de un grupo de objetos. Sirve para representar entidades del mundo real o de un sistema de software, y es el pilar principal de la programación orientada a objetos ',          1, 1);
+
 -- ============================================================
--- 15. actividad
+-- 8. Grupo
 -- ============================================================
- 
-INSERT INTO public.actividad (
-    pkid_actividad, nombre_actividad, url_actividad,
-    disponible_actividad, fkidteoria_actividad
+INSERT INTO public.grupo (
+    pkid_grupo, fechacreacion_grupo, nombre_grupo,
+    descripcion_grupo, fkidprofesorcursoimpartido_grupo, fkidcursocursoimpartido_grupo
 ) VALUES
-(1, 'Quiz Variables',   'https://act.uni.edu/quiz-variables',   TRUE,  2),
-(2, 'Ejerc Funciones',  'https://act.uni.edu/ejerc-funciones',  TRUE,  3),
-(3, 'Quiz Entidades',   'https://act.uni.edu/quiz-entidades',   TRUE,  4),
-(4, 'Taller ER',        'https://act.uni.edu/taller-er',        FALSE, 5),
-(5, 'Quiz SELECT',      'https://act.uni.edu/quiz-select',      TRUE,  6),
-(6, 'Lab Redes',        'https://act.uni.edu/lab-redes',        FALSE, 7);
- 
+(1, '2024-02-05 08:00:00', 'Grupo A',  'Grupo A de Clases UML semestre 2024-1.',   1002, 1);
  
 -- ============================================================
--- 16. juego
+-- 8. juego
 -- ============================================================
  
 INSERT INTO public.juego (
     pkid_juego, nombre_juego, descripcion_juego,
     puntuacion_juego, fkidmodulo_juego, fkidgrupo_juego
 ) VALUES
-(1, 'Ahorcado Py',    'Adivina el termino de programacion en Python.',   20, 1, 1),
-(2, 'Quiz ER',        'Preguntas de seleccion multiple sobre modelo ER.', 20, 3, 2),
-(3, 'Crucigrama SQL', 'Crucigrama con comandos y clausulas SQL.',         20, 4, 2),
-(4, 'Trivia Redes',   'Preguntas rapidas sobre topologias y protocolos.', 20, 5, 3);
- 
- 
+(1, 'Carrito Supermercado',    'A un carro se le pueden agregar muchos productos, explora la abstracción del problema',   100, 1, 1);
+
 -- ============================================================
--- 17. juegoelegido
--- ============================================================
- 
-INSERT INTO public.juegoelegido (pfkidjuego_juegoelegido, pfkidgrupo_juegoelegido) VALUES
-(1, 1),
-(2, 2),
-(3, 2),
-(4, 3);
- 
- 
--- ============================================================
--- 18. ingresojuego
--- ============================================================
- 
-INSERT INTO public.ingresojuego (
-    pkid_ingresojuego, puntuacionobtenida_ingresojuego,
-    fecharegistro_ingresojuego,
-    fkidestudianteparticipacion_ingresojuego,
-    fkidgrupoparticipacion_ingresojuego,
-    fkidjuegojuegoelegido_ingresojuego,
-    fkidgrupojuegoelegido_ingresojuego
-) VALUES
-(1, 18, '2024-04-10 10:00:00', 1003, 1, 1, 1),
-(2, 15, '2024-04-11 11:00:00', 1004, 2, 2, 2),
-(3, 20, '2024-04-12 09:00:00', 1004, 2, 3, 2),
-(4, 12, '2024-04-13 14:00:00', 1004, 3, 4, 3);
- 
- 
--- ============================================================
--- 19. tipocomponente
--- Tipos para diagrama de clases UML (modulo 3 - Modelo ER/UML)
+-- 9. tipocomponente
+-- Tipos para diagrama de clases UML (modulo 1 - Modelo ER/UML)
 -- ============================================================
 
 INSERT INTO public.tipocomponente (pkid_tipocomponente, nombre_tipocomponente, fkidmodulo_tipocomponente) VALUES
-(1, 'Clase',    3),
-(2, 'Atributo', 3),
-(3, 'Metodo',   3),
-(4, 'Relacion', 3);
-
-
--- ============================================================
--- 20. componente — Juego: "Producto y Carrito"  (pkid_juego = 1)
---
--- Jerarquia:
---   Clases (sin padre):
---     1  → Producto
---     2  → Carrito
---
---   Atributos de Producto (padre = 1):
---     3  → nombre    (private, string)
---     4  → precio    (private, number)
---     5  → stock     (private, number)
---
---   Metodos de Producto (padre = 1):
---     6  → aplicarDescuento()  (public)
---     7  → estaDisponible()    (public)
---
---   Atributos de Carrito (padre = 2):
---     8  → total     (private, number)
---     9  → cantidad  (private, number)
---
---   Metodos de Carrito (padre = 2):
---     10 → agregar() (public)
---     11 → vaciar()  (public)
--- ============================================================
+(1, 'Clase',    1),
+(2, 'Atributo', 1),
+(3, 'Metodo',   1),
+(4, 'Relacion', 1);
 
 -- Clases (raiz, sin padre)
 
@@ -2830,85 +2628,20 @@ INSERT INTO public.componente (
     fkidtipocomponente_componente, fkidjuego_componente
 ) VALUES
 (10, 'agregar()', '{"visibilidad": "public", "tipo": "void"}', 2, 'agregar() anade un producto al Carrito.', 3, 1),
-(11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1);
+(11, 'vaciar()',  '{"visibilidad": "public", "tipo": "void"}', 2, 'vaciar() elimina todos los productos del Carrito.', 3, 1),
 (12, null, '{"claseOrigen": 1, "claseDestino": 2, "tipo": "Agregacion"} ', null, 'Carrito agrega Productos, ya que un Carrito puede contener múltiples Productos pero estos pueden existir de forma independiente.', 4, 1);
 
 
 
 
 
-----------------------------------------------------------------
---               PROCEDIMIENTOS ALMACENADOS
-----------------------------------------------------------------
---registrar curso
+-------------------------------------------------------------------
+--                  PROCEDIMIENTOS ALMACENADOS                   --
+-------------------------------------------------------------------
 
-CREATE OR REPLACE PROCEDURE registrar_curso(
-	IN codigocurso INT,
-    IN descripcion VARCHAR,
-    IN nombrecurso VARCHAR,
-    IN administrador BIGINT,
-    IN imagen TEXT
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	--insertar
-	INSERT INTO curso (
-			pkid_curso,
-    		descripcion_curso,
-    		nombre_curso,
-    		pfkidadministrador_curso,
-    		imagen_curso
-	) VALUES (
-		codigocurso, descripcion, nombrecurso, administrador, imagen
-	);
-END;
-$$;
-
-
---registrar profesor
-
-CREATE OR REPLACE PROCEDURE registrar_profesor(
-	IN cedula BIGINT,
-	IN primernombre VARCHAR, 
-	IN segundonombre VARCHAR, 
-	IN primerapellido VARCHAR,
-	IN segundoapellido VARCHAR,
-	IN rol tipo_perfil,
-	IN fechanacimiento TIMESTAMP,
-	IN telefono BIGINT,
-	IN email VARCHAR,
-	IN contrasenia VARCHAR,
-	IN codigoprograma INT
-)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	--insertar
-	INSERT INTO perfil (
-		pkcc_perfil,
-    		primernombre_perfil,
-    		segundonombre_perfil,
-    		primerapellido_perfil,
-    		segundoapellido_perfil,
-    		rol,
-    		fechanacimiento_perfil,
-    		telefono_perfil,
-    		email_perfil,
-    		contrasenia_perfil,
-    		fkcodigoprograma_perfil
-	) VALUES (
-		cedula, primernombre, segundonombre, primerapellido, segundoapellido, rol,
-        fechanacimiento, telefono, email, contrasenia, codigoprograma
-	);
-	
-END;
-$$;
-
-
-
-
---registrar estudiante
+-- 
+-- Registrar estudiante 
+-- 
 
 CREATE OR REPLACE PROCEDURE registrar_estudiante(
 	IN cedula BIGINT,
@@ -2927,18 +2660,57 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
 	--insertar
-	INSERT INTO perfil (
+	INSERT INTO public.perfil (
 		pkcc_perfil,
-    		primernombre_perfil,
-    		segundonombre_perfil,
-    		primerapellido_perfil,
-    		segundoapellido_perfil,
-    		rol,
-    		fechanacimiento_perfil,
-    		telefono_perfil,
-    		email_perfil,
-    		contrasenia_perfil,
-    		fkcodigoprograma_perfil
+        primernombre_perfil,
+        segundonombre_perfil,
+        primerapellido_perfil,
+        segundoapellido_perfil,
+        rol,
+        fechanacimiento_perfil,
+        telefono_perfil,
+        email_perfil,
+        contrasenia_perfil,
+        fkcodigoprograma_perfil
+	) VALUES (
+		cedula, primernombre, segundonombre, primerapellido, segundoapellido, rol,
+        fechanacimiento, telefono, email, contrasenia, codigoprograma
+	);
+END;
+$$;
+
+-- 
+-- Registrar profesor 
+-- 
+CREATE OR REPLACE PROCEDURE registrar_profesor(
+	IN cedula BIGINT,
+	IN primernombre VARCHAR, 
+	IN segundonombre VARCHAR, 
+	IN primerapellido VARCHAR,
+	IN segundoapellido VARCHAR,
+	IN rol tipo_perfil,
+	IN fechanacimiento TIMESTAMP,
+	IN telefono BIGINT,
+	IN email VARCHAR,
+	IN contrasenia VARCHAR,
+	IN codigoprograma INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	--insertar
+	INSERT INTO public.perfil (
+		pkcc_perfil,
+        primernombre_perfil,
+        segundonombre_perfil,
+        primerapellido_perfil,
+        segundoapellido_perfil,
+        rol,
+        fechanacimiento_perfil,
+        telefono_perfil,
+        email_perfil,
+        contrasenia_perfil,
+        fkcodigoprograma_perfil
 	) VALUES (
 		cedula, primernombre, segundonombre, primerapellido, segundoapellido, rol,
         fechanacimiento, telefono, email, contrasenia, codigoprograma
@@ -2947,267 +2719,117 @@ BEGIN
 END;
 $$;
 
+-- 
+-- Registrar curso 
+-- 
 
-
-----------------------------------------------------------------
---                   FUNCIONES 
-----------------------------------------------------------------
-
-
-CREATE OR REPLACE FUNCTION consultar_actividades(p_idteoría INT)
-RETURNS TABLE (
-    id          INT,
-    nombre      VARCHAR,
-    url         TEXT,
-    disponible  BOOLEAN
-)
-LANGUAGE plpgsql AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        a.pkid_actividad        AS id,
-        a.nombre_actividad      AS nombre,
-        a.url_actividad         AS url,
-        a.disponible_actividad  AS disponible
-    FROM public.actividad a
-    WHERE a.fkidteoria_actividad = p_idteoría;
-END;
-$$;
-
-
-
-CREATE OR REPLACE FUNCTION editar_actividad(
-    p_id         INT,
-    p_nombre     VARCHAR,
-    p_url        TEXT,
-    p_disponible BOOLEAN
-)
-RETURNS BOOLEAN
-LANGUAGE plpgsql AS $$
-BEGIN
-    UPDATE actividad
-    SET nombre_actividad     = p_nombre,
-        url_actividad        = p_url,
-        disponible_actividad = p_disponible
-    WHERE pkid_actividad = p_id;
-
-    RETURN FOUND;
-END;
-$$;
-
-
-
-CREATE OR REPLACE FUNCTION eliminar_actividad(p_id INT)
-RETURNS BOOLEAN
-LANGUAGE plpgsql AS $$
-BEGIN
-    DELETE FROM actividad WHERE pkid_actividad = p_id;
-    RETURN FOUND;
-END;
-$$;
-
-
-
-
-CREATE OR REPLACE FUNCTION registrar_actividad(
-    p_nombre     VARCHAR,
-    p_url        TEXT,
-    p_disponible BOOLEAN,
-    p_idteoría   INT
-)
-RETURNS INT
-LANGUAGE plpgsql AS $$
-DECLARE
-    nuevo_id INT;
-BEGIN
-    nuevo_id := NEXTVAL('actividad_seq');
-
-    INSERT INTO actividad (pkid_actividad, nombre_actividad, url_actividad, disponible_actividad, fkidteoria_actividad)
-    VALUES (nuevo_id, p_nombre, p_url, p_disponible, p_idteoría);
-
-    RETURN nuevo_id;
-END;
-$$;
-
-
-
--- registrar un modulo en un curso, retorna el id generado
-CREATE OR REPLACE FUNCTION registrar_modulo(
-    p_nombre  VARCHAR,
-    p_idcurso INT
-)
-RETURNS INT
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    nuevo_id INT;
-BEGIN
-    nuevo_id := NEXTVAL('modulo_seq');
-
-    INSERT INTO modulo (pkid_modulo, nombre_modulo, fkidcurso_modulo)
-    VALUES (nuevo_id, p_nombre, p_idcurso);
-
-    RETURN nuevo_id;
-END;
-$$;
-
-
-
-
-CREATE OR REPLACE FUNCTION registrar_teoria(
-    p_nombre   VARCHAR,
-    p_contenido TEXT,
-    p_idmodulo INT
-)
-RETURNS INT
-LANGUAGE plpgsql AS $$
-DECLARE
-    nuevo_id INT;
-BEGIN
-    nuevo_id := NEXTVAL('teoria_seq');
-
-    INSERT INTO teoria (pkid_teoria, nombre_teoria, contenido_teoria, fkidmodulo_teoria)
-    VALUES (nuevo_id, p_nombre, p_contenido, p_idmodulo);
-
-    RETURN nuevo_id;
-END;
-$$;
-
-
-
-
--- traer los modulos de un curso
-CREATE OR REPLACE FUNCTION consultar_modulos(p_idcurso INT)
-RETURNS TABLE (
-    id     INT,
-    nombre VARCHAR
+CREATE OR REPLACE PROCEDURE registrar_curso(
+	IN codigocurso INT,
+    IN descripcion VARCHAR,
+    IN nombrecurso VARCHAR,
+    IN administrador BIGINT,
+    IN imagen TEXT
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
-    SELECT
-        public.modulo.pkid_modulo AS id,
-        public.modulo.nombre_modulo AS nombre
-    FROM public.modulo
-    WHERE public.modulo.fkidcurso_modulo = p_idcurso;
+	--insertar
+	INSERT INTO public.curso (
+        pkid_curso,
+        descripcion_curso,
+        nombre_curso,
+        pfkidadministrador_curso,
+        imagen_curso
+	) VALUES (
+		codigocurso, descripcion, nombrecurso, administrador, imagen
+	);
 END;
 $$;
 
+-------------------------------------------------------------------
+--                          FUNCIONES                            --
+-------------------------------------------------------------------
 
+-- 
+-- INICIAR SESION 
+-- 
 
--- editar el nombre de un modulo
-CREATE OR REPLACE FUNCTION editar_modulo(
-    p_id     INT,
-    p_nombre VARCHAR
-)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    UPDATE modulo
-    SET nombre_modulo = p_nombre
-    WHERE pkid_modulo = p_id;
-
-    RETURN FOUND;
-END;
-$$;
-
-
--- eliminar un modulo
-CREATE OR REPLACE FUNCTION eliminar_modulo(p_id INT)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    DELETE FROM modulo WHERE pkid_modulo = p_id;
-    RETURN FOUND;
-END;
-$$;
-
-
-
-
-
-CREATE OR REPLACE FUNCTION consultar_teorias(p_idmodulo INT)
+CREATE OR REPLACE FUNCTION iniciar_sesion(email VARCHAR, contrasenia VARCHAR)
 RETURNS TABLE (
-    id       INT,
-    nombre   VARCHAR,
-    contenido TEXT
-)
-LANGUAGE plpgsql AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        t.pkid_teoria   AS id,
-        t.nombre_teoria AS nombre,
-        t.contenido_teoria AS contenido
-    FROM public.teoria t
-    WHERE t.fkidmodulo_teoria = p_idmodulo
-    ORDER BY t.orden_teoria;
-END;
-$$;
-
-
-
-
-CREATE OR REPLACE FUNCTION editar_teoria(
-    p_id        INT,
-    p_nombre    VARCHAR,
-    p_contenido TEXT
-)
-RETURNS BOOLEAN
-LANGUAGE plpgsql AS $$
-BEGIN
-    UPDATE teoria
-    SET nombre_teoria   = p_nombre,
-        contenido_teoria = p_contenido
-    WHERE pkid_teoria = p_id;
-
-    RETURN FOUND;
-END;
-$$;
-
-
-
-
-CREATE OR REPLACE FUNCTION eliminar_teoria(p_id INT)
-RETURNS BOOLEAN
-LANGUAGE plpgsql AS $$
-BEGIN
-    DELETE FROM teoria WHERE pkid_teoria = p_id;
-    RETURN FOUND;
-END;
-$$;
-
-
-
-
---traer los cursos registrados en el sistema
-CREATE OR REPLACE FUNCTION consultar_curso()
-RETURNS TABLE (
-    id            INT,
-    nombre        VARCHAR,
-    descripcion   VARCHAR,
-    fechacreacion TIMESTAMP
+	primernombre VARCHAR,
+	correo VARCHAR,
+	rol tipo_perfil,
+	id BIGINT
 )
 AS $$
 BEGIN
 	RETURN QUERY
 	--consulta
-	SELECT
-        public.curso.pkid_curso as id,
-        public.curso.nombre_curso as nombre,
-        public.curso.descripcion_curso as descripcion,
-        public.curso.fechacreacion_curso as fechacreacion
-    FROM public.curso;
+	SELECT  
+		public.perfil.primernombre_perfil as primernombre,
+		public.perfil.email_perfil as correo,
+		public.perfil.rol as rol,
+		public.perfil.pkcc_perfil as id
+	FROM	public.perfil
+	WHERE	
+        public.perfil.email_perfil = email 
+        AND
+		public.perfil.contrasenia_perfil = contrasenia
+    ORDER BY
+        public.perfil.pkcc_perfil ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- 
+-- Retornar univerisdad
+-- 
+
+CREATE OR REPLACE FUNCTION retornar_universidad()
+RETURNS TABLE(
+    id          INT,
+    nombre      VARCHAR
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        uni.pkcodigoies_universidad AS id,
+        uni.nombre_universidad AS nombre
+    FROM public.universidad uni
+    ORDER BY uni.pkcodigoies_universidad ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- 
+-- Retornar programas por universidad 
+-- 
+CREATE OR REPLACE FUNCTION retornar_programas()
+RETURNS TABLE (
+    id             INT,
+    nombre         VARCHAR,
+    id_universidad INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        p.pkcodigo_programa          AS id,
+        p.nombre_programa            AS nombre,
+        p.fkiduniversidad_programa   AS id_universidad
+    FROM public.programa p
+    ORDER BY p.pkcodigo_programa ASC;
 END;
 $$
 LANGUAGE plpgsql;
 
 
+-- 
+-- FUNCIONES DEL ADMIN 
+-- 
 
--- Traer todos los datos de los profesores registrados en el sistema
+-- Consultar profesor
 CREATE OR REPLACE FUNCTION consultar_profe()
 RETURNS TABLE (
     pkcc              BIGINT,
@@ -3239,66 +2861,26 @@ BEGIN
         pr.pkcodigo_programa       AS codigoprograma,
         pr.nombre_programa         AS nombreprograma,
         pr.fkiduniversidad_programa AS codigouniversidad
-    FROM public.perfil p
-    JOIN public.programa pr ON pr.pkcodigo_programa = p.fkcodigoprograma_perfil
-    WHERE p.rol = 'profesor';
+    FROM public.perfil p INNER JOIN public.programa pr 
+ON p.fkcodigoprograma_perfil = pr.pkcodigo_programa
+    WHERE p.rol = 'profesor'
+     ORDER BY p.pkcc_perfil ASC;
 END;
 $$
 LANGUAGE plpgsql;
 
-
-
-
---editar nombre y descripcion de un curso
-CREATE OR REPLACE FUNCTION editar_curso(
-    p_id INT,
-    p_nombre VARCHAR,
-    p_descripcion VARCHAR
-)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    UPDATE curso
-    SET nombre_curso = p_nombre,
-        descripcion_curso = p_descripcion
-    WHERE pkid_curso = p_id;
-
-    RETURN FOUND;
-END;
-$$;
-
-
-
--- =====================================================================
--- FUNCIÓN: editar_profesor
--- Descripción: Actualiza los datos de un profesor dado su cédula.
---              La cédula (pkcc) no se puede modificar.
--- Parámetros:
---   p_cedula          BIGINT
---   p_primernombre    VARCHAR
---   p_segundonombre   VARCHAR  (nullable)
---   p_primerapellido  VARCHAR
---   p_segundoapellido VARCHAR  (nullable)
---   p_fechanacimiento TIMESTAMP
---   p_telefono        BIGINT
---   p_email           VARCHAR
---   p_contrasenia     VARCHAR  (nullable — NULL conserva la contraseña actual)
---   p_codigoprograma  INT
--- Retorna: BOOLEAN → TRUE si se actualizó, FALSE si no existe
--- =====================================================================
-
+-- Editar profesor
 CREATE OR REPLACE FUNCTION editar_profesor(
     p_cedula          BIGINT,
     p_primernombre    VARCHAR,
     p_segundonombre   VARCHAR,
-    p_primerapellido  VARCHAR,
+    p_primerapellido VARCHAR,
     p_segundoapellido VARCHAR,
     p_fechanacimiento TIMESTAMP,
     p_telefono        BIGINT,
     p_email           VARCHAR,
     p_contrasenia     VARCHAR,
-    p_codigoprograma  INT
+    p_codigoprograma INT
 )
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -3315,180 +2897,91 @@ BEGIN
         contrasenia_perfil     = COALESCE(p_contrasenia, contrasenia_perfil),
         fkcodigoprograma_perfil = p_codigoprograma
     WHERE pkcc_perfil = p_cedula
-      AND rol = 'profesor';
-
+                 AND rol = 'profesor';
     RETURN FOUND;
 END;
 $$;
 
--- Prueba:
--- SELECT editar_profesor(123456789, 'Juan', 'David', 'Narvaez', 'Sepulveda',
---   '2000-05-10', 311234567, 'juan@gmail.com', '123456', 103);
-
-
---eliminar un curso registrado en el sistema
--- CREATE OR REPLACE FUNCTION eliminar_curso(
---     id INT
--- )
--- RETURNS BOOLEAN
--- AS $$ 
--- DECLARE
---     filas_afectadas INT;
--- BEGIN
---     --eliminar
---     DELETE FROM curso
---     WHERE pkid_curso = id; 
-    
---     GET DIAGNOSTICS filas_afectadas = ROW_COUNT;
-
---     RETURN filas_afectadas > 0;
--- END;
--- $$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION eliminar_curso(
-    id INT
-)
-RETURNS BOOLEAN
-AS $$ 
-BEGIN
-    --eliminar
-    DELETE FROM curso
-    WHERE pkid_curso = id; 
-    
-
-    RETURN FOUND;
-END;
-$$ LANGUAGE plpgsql;
-
-
--- esta funcion se puede mejorar, que cuando no se hayan encontrados registros eliminados, se pueda mostrar un mensaje indicando que no se encontró el profesor con la cédula proporcionada. Esto se puede lograr utilizando RAISE NOTICE o RAISE EXCEPTION para proporcionar retroalimentación al usuario.
-
-
-
---eliminar un profesor registrado en el sistema
+-- Eliminar profesor
 CREATE OR REPLACE FUNCTION eliminar_profesor(
     cedula BIGINT
 )
 RETURNS BOOLEAN
 AS $$
 BEGIN
-    --eliminar
-    DELETE FROM perfil
+    DELETE FROM public.perfil
     WHERE pkcc_perfil = cedula AND rol = 'profesor';
-
     RETURN FOUND;
 END;
-$$ LANGUAGE plpgsql;
+$$ 
+LANGUAGE plpgsql;
 
 
--- esta funcion se puede mejorar, que cuando no se hayan encontrados registros eliminados, se pueda mostrar un mensaje indicando que no se encontró el profesor con la cédula proporcionada. Esto se puede lograr utilizando RAISE NOTICE o RAISE EXCEPTION para proporcionar retroalimentación al usuario.
-
-
-
--- =====================================================================
--- FUNCIÓN: consultar_componentes_juego
--- Descripción: Retorna todos los componentes de un juego (clases,
---              atributos y métodos) junto con su tipo y datos extra.
---              Incluye clase_correcta (componentepadre_componente) que
---              es usado EXCLUSIVAMENTE por el server action de validación.
---              El frontend nunca recibe este campo.
--- Parámetros:
---   p_id_juego  INT  → ID del juego
--- Retorna:
---   id                     INT
---   nombre                 VARCHAR
---   extra                  JSON
---   retroalimentacion      TEXT
---   nombre_tipo_componente VARCHAR → 'Clase' | 'Atributo' | 'Metodo'
---   clase_correcta         INT     → padre correcto (solución); NULL para clases
--- =====================================================================
-
-CREATE OR REPLACE FUNCTION consultar_componentes_juego(p_id_juego INT)
+-- Consultar cursos
+CREATE OR REPLACE FUNCTION consultar_curso()
 RETURNS TABLE (
-    id                     INT,
-    nombre                 VARCHAR,
-    extra                  JSON,
-    retroalimentacion      TEXT,
-    nombre_tipo_componente VARCHAR,
-    clase_correcta         INT
+    id            INT,
+    nombre        VARCHAR,
+    descripcion   VARCHAR,
+    fechacreacion TIMESTAMP
 )
 AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        c.pkid_componente               AS id,
-        c.nombre_componente             AS nombre,
-        c.extra_componente              AS extra,
-        c.retroalimentacion_componente  AS retroalimentacion,
-        tc.nombre_tipocomponente        AS nombre_tipo_componente,
-        c.componentepadre_componente    AS clase_correcta
-    FROM public.componente c
-    JOIN public.tipocomponente tc
-        ON tc.pkid_tipocomponente = c.fkidtipocomponente_componente
-    WHERE c.fkidjuego_componente = p_id_juego
-    ORDER BY tc.nombre_tipocomponente, c.pkid_componente;
+        public.curso.pkid_curso as id,
+        public.curso.nombre_curso as nombre,
+        public.curso.descripcion_curso as descripcion,
+        public.curso.fechacreacion_curso as fechacreacion
+    FROM public.curso
+    ORDER BY public.curso.pkid_curso ASC;
 END;
 $$
 LANGUAGE plpgsql;
 
--- Prueba:
--- SELECT * FROM consultar_componentes_juego(1);
 
-
--- =====================================================================
--- FUNCIÓN: consultar_juego
--- Descripción: Retorna la metadata de un juego dado su ID.
--- Parámetros:
---   p_id_juego  INT  → ID del juego a consultar
--- Retorna:
---   id          INT
---   nombre      VARCHAR
---   descripcion VARCHAR
---   puntuacion  INT
--- =====================================================================
-
-CREATE OR REPLACE FUNCTION consultar_juego(p_id_juego INT)
-RETURNS TABLE (
-    id          INT,
-    nombre      VARCHAR,
-    descripcion VARCHAR,
-    puntuacion  INT
+-- Editar curso
+CREATE OR REPLACE FUNCTION editar_curso(
+    p_id INT,
+    p_nombre VARCHAR,
+    p_descripcion VARCHAR
 )
+RETURNS BOOLEAN
+LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
-    SELECT
-        j.pkid_juego        AS id,
-        j.nombre_juego      AS nombre,
-        j.descripcion_juego AS descripcion,
-        j.puntuacion_juego  AS puntuacion
-    FROM public.juego j
-    WHERE j.pkid_juego = p_id_juego;
+    UPDATE public.curso
+    SET nombre_curso = p_nombre,
+        descripcion_curso = p_descripcion
+    WHERE pkid_curso = p_id;
+    RETURN FOUND;
 END;
-$$
+$$;
+
+
+-- Eliminar curso
+CREATE OR REPLACE FUNCTION eliminar_curso(
+    id INT
+)
+RETURNS BOOLEAN
+AS $$ 
+BEGIN
+    DELETE FROM public.curso
+    WHERE pkid_curso = id; 
+    RETURN FOUND;
+END;
+$$ 
 LANGUAGE plpgsql;
 
--- Prueba:
--- SELECT * FROM consultar_juego(1);
 
+-- 
+-- FUNCIONES DEL ADMIN PARA MODULOS
+-- 
 
--- =====================================================================
--- FUNCIÓN: registrar_ingresojuego
--- Descripción: Registra el resultado de un intento de juego por parte
---              de un estudiante. Retorna el ID generado.
--- Parámetros:
---   p_id_estudiante BIGINT → CC del estudiante
---   p_id_grupo      INT    → ID del grupo
---   p_id_juego      INT    → ID del juego
---   p_puntaje       INT    → Puntaje obtenido tras la validación
--- =====================================================================
-
-CREATE OR REPLACE FUNCTION registrar_ingresojuego(
-    p_id_estudiante BIGINT,
-    p_id_grupo      INT,
-    p_id_juego      INT,
-    p_puntaje       INT
+-- Registrar módulo
+CREATE OR REPLACE FUNCTION registrar_modulo(
+    p_nombre  VARCHAR,
+    p_idcurso INT
 )
 RETURNS INT
 LANGUAGE plpgsql
@@ -3496,212 +2989,242 @@ AS $$
 DECLARE
     nuevo_id INT;
 BEGIN
-    nuevo_id := NEXTVAL('ingresojuego_seq');
-
-    INSERT INTO public.ingresojuego (
-        pkid_ingresojuego,
-        puntuacionobtenida_ingresojuego,
-        fkidestudianteparticipacion_ingresojuego,
-        fkidgrupoparticipacion_ingresojuego,
-        fkidjuegojuegoelegido_ingresojuego,
-        fkidgrupojuegoelegido_ingresojuego
-    ) VALUES (
-        nuevo_id,
-        p_puntaje,
-        p_id_estudiante,
-        p_id_grupo,
-        p_id_juego,
-        p_id_grupo
-    );
-
+    nuevo_id := NEXTVAL('modulo_seq');
+    INSERT INTO public.modulo (
+pkid_modulo, 
+nombre_modulo, 
+fkidcurso_modulo
+    ) VALUES (nuevo_id, p_nombre, p_idcurso);
     RETURN nuevo_id;
 END;
 $$;
 
--- Prueba:
--- SELECT registrar_ingresojuego(123456, 1, 1, 45);
-
-
-
-
--- Traer todos los grupos a los que pertenece un estudiante
-CREATE OR REPLACE FUNCTION consultar_grupos_estudiante(p_cedula BIGINT)
+-- Constultar módulos
+CREATE OR REPLACE FUNCTION consultar_modulos(p_idcurso INT)
 RETURNS TABLE (
-    idgrupo       INT,
-    nombregrupo   VARCHAR,
-    descripcion   VARCHAR,
-    fechaingreso  TIMESTAMP,
-    nombrecurso   VARCHAR
+    id     INT,
+    nombre VARCHAR
 )
+LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        g.pkid_grupo                       AS idgrupo,
-        g.nombre_grupo                     AS nombregrupo,
-        g.descripcion_grupo                AS descripcion,
-        p.fecharegistro_participacion      AS fechaingreso,
-        c.nombre_curso                     AS nombrecurso
-    FROM public.participacion p
-    JOIN public.grupo g
-        ON  g.pkid_grupo = p.pfkidgrupo_participacion
-    JOIN public.cursoimpartido ci
-        ON  ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
-        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
-    JOIN public.curso c
-        ON  c.pkid_curso = ci.pfkidcurso_cursoimpartido
-    WHERE p.pfkidestudiante_participacion = p_cedula;
+        public.modulo.pkid_modulo AS id,
+        public.modulo.nombre_modulo AS nombre
+    FROM public.modulo
+    WHERE public.modulo.fkidcurso_modulo = p_idcurso
+    ORDER BY public.modulo.pkid_modulo ASC;
 END;
-$$
-LANGUAGE plpgsql;
+$$;
 
-
-
-
---consultarusuario-inicio
-
-CREATE OR REPLACE FUNCTION iniciar_sesion(email VARCHAR, contrasenia VARCHAR)
-RETURNS TABLE (
-	primernombre VARCHAR,
-	correo VARCHAR,
-	rol tipo_perfil,
-	id BIGINT
+-- Editar módulo
+CREATE OR REPLACE FUNCTION editar_modulo(
+    p_id     INT,
+    p_nombre VARCHAR
 )
+RETURNS BOOLEAN
+LANGUAGE plpgsql
 AS $$
 BEGIN
-	RETURN QUERY
-	--consulta
-	SELECT  public.perfil.primernombre_perfil as primernombre,
-		public.perfil.email_perfil as correo,
-		public.perfil.rol as rol,
-		public.perfil.pkcc_perfil as id
-	FROM	public.perfil
-	WHERE	public.perfil.email_perfil = email AND
-		public.perfil.contrasenia_perfil = contrasenia;
+    UPDATE public.modulo
+    SET nombre_modulo = p_nombre
+    WHERE pkid_modulo = p_id;
+    RETURN FOUND;
 END;
-$$
-LANGUAGE plpgsql;
+$$;
 
 
-
--- Retorna todas las universidades con su ID y nombre
-CREATE OR REPLACE FUNCTION retornar_universidad()
-RETURNS TABLE(
-	id          INT,
-	nombre      VARCHAR
-)
+-- Eliminar módulo
+CREATE OR REPLACE FUNCTION eliminar_modulo(p_id INT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
 AS $$
 BEGIN
-	RETURN QUERY
-	SELECT
-		u.pkcodigoies_universidad AS id,
-		u.nombre_universidad      AS nombre
-	FROM public.universidad u
-	ORDER BY u.pkcodigoies_universidad ASC;
+    DELETE FROM public.modulo 
+    WHERE pkid_modulo = p_id;
+    RETURN FOUND;
 END;
-$$
-LANGUAGE plpgsql;
+$$;
 
+-- 
+-- FUNCIONES DEL ADMIN PARA TEORIAS
+-- 
 
--- Retorna todos los programas con su ID, nombre e ID de universidad
-CREATE OR REPLACE FUNCTION retornar_programas()
-RETURNS TABLE (
-	id             INT,
-	nombre         VARCHAR,
-	id_universidad INT
+-- Registrar toeria
+CREATE OR REPLACE FUNCTION registrar_teoria(
+    p_nombre   VARCHAR,
+    p_contenido TEXT,
+    p_idmodulo INT
 )
+RETURNS INT
+LANGUAGE plpgsql 
 AS $$
+DECLARE
+    nuevo_id INT;
 BEGIN
-	RETURN QUERY
-	SELECT
-		p.pkcodigo_programa          AS id,
-		p.nombre_programa            AS nombre,
-		p.fkiduniversidad_programa   AS id_universidad
-	FROM public.programa p
-	ORDER BY p.pkcodigo_programa ASC;
+    nuevo_id := NEXTVAL('teoria_seq');
+    INSERT INTO public.teoria (
+pkid_teoria, 
+nombre_teoria, 
+contenido_teoria, 
+fkidmodulo_teoria
+    ) VALUES (nuevo_id, p_nombre, p_contenido, p_idmodulo);
+    RETURN nuevo_id;
 END;
-$$
-LANGUAGE plpgsql;
+$$;
 
 
-
-CREATE OR REPLACE FUNCTION consultar_juegos_grupo_estudiante(
-    p_idgrupo  INT,
-    p_cedula   BIGINT
-)
+-- Consultar teorias
+CREATE OR REPLACE FUNCTION consultar_teorias(p_idmodulo INT)
 RETURNS TABLE (
-    idjuego      INT,
-    nombrejuego  VARCHAR,
-    mejorpuntaje INT,
-    ultimavez    TIMESTAMP
+    id       INT,
+    nombre   VARCHAR,
+    contenido TEXT
 )
+LANGUAGE plpgsql 
 AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        j.pkid_juego                                 AS idjuego,
-        j.nombre_juego                               AS nombrejuego,
-        MAX(ij.puntuacionobtenida_ingresojuego)::INT AS mejorpuntaje,
-        MAX(ij.fecharegistro_ingresojuego)           AS ultimavez
-    FROM public.participacion p
-    JOIN public.juegoelegido je
-        ON  je.pfkidgrupo_juegoelegido = p.pfkidgrupo_participacion
-    JOIN public.juego j
-        ON  j.pkid_juego = je.pfkidjuego_juegoelegido
-    LEFT JOIN public.ingresojuego ij
-        -- lado participacion
-        ON  ij.fkidestudianteparticipacion_ingresojuego = p.pfkidestudiante_participacion
-        AND ij.fkidgrupoparticipacion_ingresojuego      = p.pfkidgrupo_participacion
-        -- lado juegoelegido
-        AND ij.fkidjuegojuegoelegido_ingresojuego       = je.pfkidjuego_juegoelegido
-        AND ij.fkidgrupojuegoelegido_ingresojuego       = je.pfkidgrupo_juegoelegido
-    WHERE p.pfkidestudiante_participacion = p_cedula
-      AND p.pfkidgrupo_participacion      = p_idgrupo
-    GROUP BY j.pkid_juego, j.nombre_juego
-    ORDER BY j.pkid_juego;
+        t.pkid_teoria   AS id,
+        t.nombre_teoria AS nombre,
+        t.contenido_teoria AS contenido
+    FROM public.teoria t
+    WHERE t.fkidmodulo_teoria = p_idmodulo
+    ORDER BY t.orden_teoria;
 END;
-$$
-LANGUAGE plpgsql;
+$$;
 
-
-CREATE OR REPLACE FUNCTION unirse_grupo(p_cedula BIGINT, p_idgrupo INT)
-RETURNS TABLE (
-    idgrupo       INT,
-    nombregrupo   VARCHAR,
-    descripcion   VARCHAR,
-    fechaingreso  TIMESTAMP,
-    nombrecurso   VARCHAR
+-- Editar teoria
+CREATE OR REPLACE FUNCTION editar_teoria(
+    p_id        INT,
+    p_nombre    VARCHAR,
+    p_contenido TEXT
 )
+RETURNS BOOLEAN
+LANGUAGE plpgsql 
 AS $$
 BEGIN
-    INSERT INTO public.participacion (
-        pfkidestudiante_participacion,
-        pfkidgrupo_participacion
-    ) VALUES (p_cedula, p_idgrupo);
+    UPDATE public.teoria
+    SET nombre_teoria   = p_nombre,
+        contenido_teoria = p_contenido
+    WHERE pkid_teoria = p_id;
+    RETURN FOUND;
+END;
+$$;
 
+
+-- Eliminar teoria
+CREATE OR REPLACE FUNCTION eliminar_teoria(p_id INT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql 
+AS $$
+BEGIN
+    DELETE FROM public.teoria 
+    WHERE pkid_teoria = p_id;
+    RETURN FOUND;
+END;
+$$;
+
+-- 
+-- FUNCIONES DEL ADMIN PARA ACTIVIDADES
+-- 
+
+-- Registrar actividad
+CREATE OR REPLACE FUNCTION registrar_actividad(
+    p_nombre     VARCHAR,
+    p_url        TEXT,
+    p_disponible BOOLEAN,
+    p_idteoría   INT
+)
+RETURNS INT
+LANGUAGE plpgsql 
+AS $$
+DECLARE
+    nuevo_id INT;
+BEGIN
+    nuevo_id := NEXTVAL('actividad_seq');
+  INSERT INTO public.actividad (
+        pkid_actividad,
+        nombre_actividad, 
+        url_actividad, 
+        disponible_actividad, 
+        fkidteoria_actividad
+   ) VALUES (nuevo_id, p_nombre, p_url, p_disponible, p_idteoría);
+    RETURN nuevo_id;
+END;
+$$;
+
+-- Consultar actividad
+CREATE OR REPLACE FUNCTION consultar_actividades(
+    IN p_idteoría INT
+)
+RETURNS TABLE (
+    id          INT,
+    nombre      VARCHAR,
+    url         TEXT,
+    disponible  BOOLEAN
+)
+LANGUAGE plpgsql 
+AS $$
+BEGIN
     RETURN QUERY
     SELECT
-        g.pkid_grupo                       AS idgrupo,
-        g.nombre_grupo                     AS nombregrupo,
-        g.descripcion_grupo                AS descripcion,
-        p.fecharegistro_participacion      AS fechaingreso,
-        c.nombre_curso                     AS nombrecurso
-    FROM public.participacion p
-    JOIN public.grupo g
-        ON  g.pkid_grupo = p.pfkidgrupo_participacion
-    JOIN public.cursoimpartido ci
-        ON  ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
-        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
-    JOIN public.curso c
-        ON  c.pkid_curso = ci.pfkidcurso_cursoimpartido
-    WHERE p.pfkidestudiante_participacion = p_cedula
-      AND p.pfkidgrupo_participacion      = p_idgrupo;
+        a.pkid_actividad        AS id,
+        a.nombre_actividad      AS nombre,
+        a.url_actividad         AS url,
+        a.disponible_actividad AS disponible
+    FROM public.actividad a
+    WHERE a.fkidteoria_actividad = p_idteoría
+    ORDER BY a.pkid_actividad ASC;
 END;
-$$
+$$;
 
---obtener datos del usuario para la ventana perfil
+-- Editar actidad
+CREATE OR REPLACE FUNCTION editar_actividad(
+    IN p_id         INT,
+    IN p_nombre     VARCHAR,
+    IN p_url        TEXT,
+    IN p_disponible BOOLEAN
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql 
+AS $$
+BEGIN
+    UPDATE public.actividad
+    SET nombre_actividad     = p_nombre,
+        url_actividad        = p_url,
+        disponible_actividad = p_disponible
+    WHERE pkid_actividad = p_id;
+    RETURN FOUND;
+END;
+$$;
+
+
+-- Eliminar actividad
+CREATE OR REPLACE FUNCTION eliminar_actividad(p_id INT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql 
+AS $$
+BEGIN
+    DELETE FROM public.actividad 
+    WHERE pkid_actividad = p_id;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+-- 
+-- FUNCIONES DEL ADMIN PARA PERFIL
+-- 
+
+
+-- Consultar datos del perfil de administrador
+
 CREATE OR REPLACE FUNCTION obtener_datos(
-	IN cedula BIGINT
+    IN cedula BIGINT
 )
 RETURNS TABLE(
     pkcc              BIGINT,
@@ -3720,8 +3243,8 @@ RETURNS TABLE(
 )
 AS $$
 BEGIN
-	RETURN QUERY
-	SELECT
+    RETURN QUERY
+    SELECT
         p.pkcc_perfil              AS pkcc,
         p.primernombre_perfil      AS primernombre,
         p.segundonombre_perfil     AS segundonombre,
@@ -3735,25 +3258,389 @@ BEGIN
         pr.nombre_programa         AS nombreprograma,
         pr.fkiduniversidad_programa AS codigouniversidad,
         u.nombre_universidad       AS nombreuniversidad
-    FROM public.perfil p
-    JOIN public.programa pr ON pr.pkcodigo_programa = p.fkcodigoprograma_perfil
-    JOIN public.universidad u ON u.pkcodigoies_universidad = pr.fkiduniversidad_programa
-    WHERE p.pkcc_perfil = cedula;
+    FROM public.perfil p INNER JOIN public.programa pr 
+ON pr.pkcodigo_programa = p.fkcodigoprograma_perfil
+             INNER JOIN public.universidad u 
+ON pr.fkiduniversidad_programa = u.pkcodigoies_universidad
+    WHERE p.pkcc_perfil = cedula
+    ORDER BY p.pkcc_perfil ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- 
+-- FUNCIONES DE ESTUDIANTE PARA GRUPOS
+-- 
+
+-- Funcion unirse a un grupo
+CREATE OR REPLACE FUNCTION unirse_grupo(
+IN p_cedula BIGINT, 
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechaingreso  TIMESTAMP,
+    nombrecurso   VARCHAR
+)
+AS $$
+BEGIN
+    INSERT INTO public.participacion (
+        pfkidestudiante_participacion,
+        pfkidgrupo_participacion
+    ) VALUES (p_cedula, p_idgrupo);
+    RETURN QUERY
+    SELECT
+        g.pkid_grupo                       AS idgrupo,
+        g.nombre_grupo                     AS nombregrupo,
+        g.descripcion_grupo                AS descripcion,
+        p.fecharegistro_participacion      AS fechaingreso,
+        c.nombre_curso                     AS nombrecurso
+    FROM public.participacion p INNER JOIN public.grupo g
+                ON g.pkid_grupo = p.pfkidgrupo_participacion
+       INNER JOIN public.cursoimpartido ci
+                ON ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+                    AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+        INNER JOIN public.curso c
+                ON c.pkid_curso = ci.pfkidcurso_cursoimpartido
+    WHERE p.pfkidestudiante_participacion = p_cedula
+              AND p.pfkidgrupo_participacion      = p_idgrupo
+    ORDER BY g.pkid_grupo ASC ;
 END;
 $$
 LANGUAGE plpgsql;
 
 
--- Secuencia para grupos
-CREATE SEQUENCE IF NOT EXISTS grupo_seq
-  START WITH 1000
-  INCREMENT BY 1
-  MAXVALUE 99000
-  CACHE 1
-  NO CYCLE;
+-- Consultar todos los gruopos de un estudiante
+CREATE OR REPLACE FUNCTION consultar_grupos_estudiante(
+    IN p_cedula BIGINT
+)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechaingreso  TIMESTAMP,
+    nombrecurso   VARCHAR
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        g.pkid_grupo                       AS idgrupo,
+        g.nombre_grupo                     AS nombregrupo,
+        g.descripcion_grupo                AS descripcion,
+        p.fecharegistro_participacion      AS fechaingreso,
+        c.nombre_curso                     AS nombrecurso
+    FROM public.participacion p INNER JOIN public.grupo g
+                ON g.pkid_grupo = p.pfkidgrupo_participacion
+        INNER JOIN public.cursoimpartido ci
+                ON ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+                AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+        INNER JOIN public.curso c
+                ON c.pkid_curso = ci.pfkidcurso_cursoimpartido
+    WHERE p.pfkidestudiante_participacion = p_cedula
+    ORDER BY g.pkid_grupo ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- CONSULTAR MODULOS DE UN CURSO
+CREATE OR REPLACE FUNCTION consultar_modulos_grupo(
+    IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idmodulo INT,
+    nombre    VARCHAR
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        m.pkid_modulo   AS idmodulo,
+        m.nombre_modulo AS nombre
+    FROM public.grupo g INNER JOIN public.cursoimpartido ci
+                ON ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+                AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+        INNER JOIN public.modulo m
+                ON m.fkidcurso_modulo = ci.pfkidcurso_cursoimpartido
+    WHERE g.pkid_grupo = p_idgrupo
+    ORDER BY m.pkid_modulo;
+END;
+$$
+LANGUAGE plpgsql;
 
 
--- Traer los datos de un curso por su id
+-- Consultar teorias de un módulo
+CREATE OR REPLACE FUNCTION consultar_teorias_grupo(
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idteoria  INT,
+    nombre    VARCHAR,
+    contenido TEXT,
+    orden     INT,
+    idmodulo  INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.pkid_teoria       AS idteoria,
+        t.nombre_teoria     AS nombre,
+        t.contenido_teoria  AS contenido,
+        t.orden_teoria      AS orden,
+        t.fkidmodulo_teoria AS idmodulo
+    FROM public.grupo g 
+    INNER JOIN public.cursoimpartido ci
+        ON ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+    INNER JOIN public.modulo m
+        ON m.fkidcurso_modulo = ci.pfkidcurso_cursoimpartido
+    INNER JOIN public.teoria t
+        ON t.fkidmodulo_teoria = m.pkid_modulo
+    WHERE g.pkid_grupo = p_idgrupo
+    ORDER BY m.pkid_modulo, t.orden_teoria;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Consultar actividades de una teoría
+CREATE OR REPLACE FUNCTION consultar_actividades_grupo(
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idactividad  INT,
+    nombre       VARCHAR,
+    url          TEXT,
+    disponible   BOOLEAN,
+    idteoria     INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        a.pkid_actividad        AS idactividad,
+        a.nombre_actividad      AS nombre,
+        a.url_actividad         AS url,
+        a.disponible_actividad  AS disponible,
+        a.fkidteoria_actividad  AS idteoria
+    FROM public.grupo g 
+    INNER JOIN public.cursoimpartido ci
+        ON ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+    INNER JOIN public.modulo m
+        ON m.fkidcurso_modulo = ci.pfkidcurso_cursoimpartido
+    INNER JOIN public.teoria t
+        ON t.fkidmodulo_teoria = m.pkid_modulo
+    INNER JOIN public.actividad a
+        ON a.fkidteoria_actividad = t.pkid_teoria
+    WHERE g.pkid_grupo = p_idgrupo
+    ORDER BY a.pkid_actividad ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Consultar enalces por refuerzos
+CREATE OR REPLACE FUNCTION consultar_enlaces_grupo(
+    IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idenlace    INT,
+    tipo        VARCHAR,
+    contenido   TEXT,
+    puntuacion  INT,
+    idrefuerzo  INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        e.pkid_enlace          AS idenlace,
+        e.tipo_enlace ::VARCHAR AS tipo,
+        e.contenido_enlace     AS contenido,
+        e.puntuacion_enlace    AS puntuacion,
+        e.fkidrefuerzo_enlace AS idrefuerzo
+    FROM public.refuerzo r 
+    INNER JOIN public.enlace e
+        ON e.fkidrefuerzo_enlace = r.pkid_refuerzo
+    WHERE r.fkidgrupo_refuerzo = p_idgrupo
+    ORDER BY e.pkid_enlace ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- 
+-- FUNCIONES DE JUEGOS POR ESTUDIANTE 
+-- 
+
+-- Consultar todos juegos de un modulo estudainte
+
+CREATE OR REPLACE FUNCTION consultar_juegos_grupo_estudiante(
+    IN p_idgrupo  INT,
+    IN p_cedula   BIGINT
+)
+RETURNS TABLE (
+    idjuego      INT,
+    nombrejuego  VARCHAR,
+    mejorpuntaje INT,
+    ultimavez    TIMESTAMP,
+    idmodulo     INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        j.pkid_juego                                 AS idjuego,
+        j.nombre_juego                               AS nombrejuego,
+        MAX(ij.puntuacionobtenida_ingresojuego)::INT AS mejorpuntaje,
+        MAX(ij.fecharegistro_ingresojuego)           AS ultimavez,
+        j.fkidmodulo_juego                           AS idmodulo
+    FROM public.participacion p 
+    INNER JOIN public.juegoelegido je
+        ON je.pfkidgrupo_juegoelegido = p.pfkidgrupo_participacion
+    INNER JOIN public.juego j
+        ON j.pkid_juego = je.pfkidjuego_juegoelegido
+    LEFT JOIN public.ingresojuego ij
+    -- lado participacion
+        ON ij.fkidestudianteparticipacion_ingresojuego = p.pfkidestudiante_participacion
+        AND ij.fkidgrupoparticipacion_ingresojuego      = p.pfkidgrupo_participacion
+-- lado juegoelegido
+        AND ij.fkidjuegojuegoelegido_ingresojuego       = je.pfkidjuego_juegoelegido
+        AND ij.fkidgrupojuegoelegido_ingresojuego       = je.pfkidgrupo_juegoelegido
+    WHERE p.pfkidestudiante_participacion = p_cedula
+        AND p.pfkidgrupo_participacion      = p_idgrupo
+    GROUP BY 
+        j.pkid_juego, 
+        j.nombre_juego, 
+        j.fkidmodulo_juego
+    ORDER BY j.pkid_juego ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Consultar un juego específico de un estudiante en un grupo
+CREATE OR REPLACE FUNCTION consultar_juego(
+    IN p_id_juego INT
+)
+RETURNS TABLE (
+    id          INT,
+    nombre      VARCHAR,
+    descripcion VARCHAR,
+    puntuacion  INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        j.pkid_juego        AS id,
+        j.nombre_juego      AS nombre,
+        j.descripcion_juego AS descripcion,
+        j.puntuacion_juego  AS puntuacion
+    FROM public.juego j
+    WHERE j.pkid_juego = p_id_juego
+    ORDER BY j.pkid_juego ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Consultar los componentes de un juego especifico
+CREATE OR REPLACE FUNCTION consultar_componentes_juego(
+    IN p_id_juego INT
+)
+RETURNS TABLE (
+    id                     INT,
+    nombre                 VARCHAR,
+    extra                  JSON,
+    retroalimentacion      TEXT,
+    nombre_tipo_componente VARCHAR,
+    clase_correcta         INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.pkid_componente               AS id,
+        c.nombre_componente             AS nombre,
+        c.extra_componente              AS extra,
+        c.retroalimentacion_componente AS retroalimentacion,
+        tc.nombre_tipocomponente        AS nombre_tipo_componente,
+        c.componentepadre_componente    AS clase_correcta
+    FROM public.componente c INNER JOIN public.tipocomponente tc
+                ON tc.pkid_tipocomponente = c.fkidtipocomponente_componente
+    WHERE c.fkidjuego_componente = p_id_juego
+    ORDER BY tc.nombre_tipocomponente, c.pkid_componente;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Registrar partida
+CREATE OR REPLACE FUNCTION registrar_ingresojuego(
+    IN p_id_estudiante BIGINT,
+    IN p_id_grupo      INT,
+    IN p_id_juego      INT,
+    IN p_puntaje       INT
+)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    nuevo_id INT;
+BEGIN
+    nuevo_id := NEXTVAL('ingresojuego_seq');
+    INSERT INTO public.ingresojuego (
+        pkid_ingresojuego,
+        puntuacionobtenida_ingresojuego,
+        fkidestudianteparticipacion_ingresojuego,
+        fkidgrupoparticipacion_ingresojuego,
+        fkidjuegojuegoelegido_ingresojuego,
+        fkidgrupojuegoelegido_ingresojuego
+    ) VALUES (nuevo_id, p_puntaje, p_id_estudiante, p_id_grupo, p_id_juego, p_id_grupo);
+    RETURN nuevo_id;
+END;
+$$;
+
+
+
+-- 
+-- FUNCIONES DEL PROFESOR
+-- 
+
+-- Consultar crusos por profesor
+CREATE OR REPLACE FUNCTION consultar_cursos_profesor(
+IN p_cedula BIGINT
+)
+RETURNS TABLE (
+    idcurso       INT,
+    nombrecurso   VARCHAR,
+    descripcion   VARCHAR,
+    imagen        TEXT,
+    fechacreacion TIMESTAMP
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.pkid_curso             AS idcurso,
+        c.nombre_curso           AS nombrecurso,
+        c.descripcion_curso      AS descripcion,
+        c.imagen_curso           AS imagen,
+        c.fechacreacion_curso    AS fechacreacion
+    FROM public.cursoimpartido ci INNER JOIN public.curso c
+                ON c.pkid_curso = ci.pfkidcurso_cursoimpartido
+    WHERE ci.pfkidprofesor_cursoimpartido = p_cedula
+    ORDER BY c.pkid_curso ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Consultar un curso es especifico 
 CREATE OR REPLACE FUNCTION consultar_curso_por_id(p_idcurso INT)
 RETURNS TABLE (
     idcurso       INT,
@@ -3777,36 +3664,12 @@ END;
 $$
 LANGUAGE plpgsql;
 
-
-CREATE OR REPLACE FUNCTION consultar_grupos_profesor_curso(p_cedula BIGINT, p_idcurso INT)
-RETURNS TABLE (
-    idgrupo       INT,
-    nombregrupo   VARCHAR,
-    descripcion   VARCHAR,
-    fechacreacion TIMESTAMP
-)
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        g.pkid_grupo            AS idgrupo,
-        g.nombre_grupo          AS nombregrupo,
-        g.descripcion_grupo     AS descripcion,
-        g.fechacreacion_grupo   AS fechacreacion
-    FROM public.grupo g
-    WHERE g.fkidprofesorcursoimpartido_grupo = p_cedula
-      AND g.fkidcursocursoimpartido_grupo    = p_idcurso;
-END;
-$$
-LANGUAGE plpgsql;
-
-
-
+-- Crear grupo
 CREATE OR REPLACE FUNCTION crear_grupo(
-    p_nombre      VARCHAR,
-    p_descripcion VARCHAR,
-    p_cedula      BIGINT,
-    p_idcurso     INT
+    IN p_nombre      VARCHAR,
+    IN p_descripcion VARCHAR,
+    IN p_cedula      BIGINT,
+    IN p_idcurso     INT
 )
 RETURNS TABLE (
     idgrupo       INT,
@@ -3826,38 +3689,119 @@ BEGIN
         descripcion_grupo,
         fkidprofesorcursoimpartido_grupo,
         fkidcursocursoimpartido_grupo
-    ) VALUES (
-        v_idgrupo,
-        v_fecha,
-        p_nombre,
-        p_descripcion,
-        p_cedula,
-        p_idcurso
-    );
-
+    ) VALUES (v_idgrupo, v_fecha, p_nombre, p_descripcion, p_cedula, p_idcurso);
     RETURN QUERY
     SELECT
         v_idgrupo      AS idgrupo,
         p_nombre       AS nombregrupo,
-        p_descripcion  AS descripcion,
+        p_descripcion AS descripcion,
         v_fecha        AS fechacreacion;
 END;
 $$
 LANGUAGE plpgsql;
 
-CREATE SEQUENCE IF NOT EXISTS refuerzo_seq
-  START WITH 1
-  INCREMENT BY 1
-  NO MAXVALUE
-  CACHE 1
-  NO CYCLE;
+
+-- Consultar grupos de un profesor de un curso en especifico 
+CREATE OR REPLACE FUNCTION consultar_grupos_profesor_curso(
+IN p_cedula BIGINT, 
+IN p_idcurso INT
+)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechacreacion TIMESTAMP
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        g.pkid_grupo            AS idgrupo,
+        g.nombre_grupo          AS nombregrupo,
+        g.descripcion_grupo     AS descripcion,
+        g.fechacreacion_grupo   AS fechacreacion
+    FROM public.grupo g
+    WHERE g.fkidprofesorcursoimpartido_grupo = p_cedula
+          AND g.fkidcursocursoimpartido_grupo    = p_idcurso
+    ORDER BY g.pkid_grupo ASC;
+END;
+$$
+LANGUAGE plpgsql;
 
 
+-- Consultar un grupo específico de un profesor
+CREATE OR REPLACE FUNCTION consultar_grupo_por_id(
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idgrupo       INT,
+    nombregrupo   VARCHAR,
+    descripcion   VARCHAR,
+    fechacreacion TIMESTAMP,
+    idcurso       INT,
+    nombrecurso   VARCHAR
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        g.pkid_grupo                       AS idgrupo,
+        g.nombre_grupo                     AS nombregrupo,
+        g.descripcion_grupo                AS descripcion,
+        g.fechacreacion_grupo              AS fechacreacion,
+        c.pkid_curso                       AS idcurso,
+        c.nombre_curso                     AS nombrecurso
+    FROM public.grupo g 
+    INNER JOIN public.cursoimpartido ci
+        ON ci.pfkidcurso_cursoimpartido    = g.fkidcursocursoimpartido_grupo
+        AND ci.pfkidprofesor_cursoimpartido = g.fkidprofesorcursoimpartido_grupo
+    INNER JOIN public.curso c
+        ON c.pkid_curso = ci.pfkidcurso_cursoimpartido
+    WHERE g.pkid_grupo = p_idgrupo
+    ORDER BY g.pkid_grupo ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Consultar listado de estudiantes de un grupo
+CREATE OR REPLACE FUNCTION consultar_estudiantes_grupo(
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    cedula           BIGINT,
+    nombre           TEXT,
+    correo           VARCHAR,
+    puntuaciontotal INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        pe.pkcc_perfil AS cedula,
+       ---ayudar a quitar espacios cuando no haya nombre y apellido
+        TRIM(BOTH ' ' FROM
+            pe.primernombre_perfil   || ' ' ||
+            COALESCE(pe.segundonombre_perfil, '') || ' ' ||
+            pe.primerapellido_perfil || ' ' ||
+            COALESCE(pe.segundoapellido_perfil, '')
+        )                                  AS nombre,
+        pe.email_perfil                    AS correo,
+        pa.puntuaciontotal_participacion   AS puntuaciontotal
+    FROM public.participacion pa INNER JOIN public.perfil pe
+                ON pe.pkcc_perfil = pa.pfkidestudiante_participacion
+    WHERE pa.pfkidgrupo_participacion = p_idgrupo
+   ORDER BY pe.pkcc_perfil ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Crear refuerzo
 CREATE OR REPLACE FUNCTION crear_refuerzo(
-    p_explicacion TEXT,
-    p_puntuacion  INT,
-    p_idmodulo    INT,
-    p_idgrupo     INT
+    IN p_explicacion TEXT,
+    IN p_puntuacion INT,
+    IN p_idmodulo    INT,
+    IN p_idgrupo     INT
 )
 RETURNS BOOLEAN
 AS $$
@@ -3870,13 +3814,313 @@ BEGIN
         puntuacion_refuerzo,
         fkidmodulo_refuerzo,
         fkidgrupo_refuerzo
-    ) VALUES (
-        v_idrefuerzo,
-        p_explicacion,
-        p_puntuacion,
-        p_idmodulo,
-        p_idgrupo
-    );
+    ) VALUES (v_idrefuerzo, p_explicacion, p_puntuacion, p_idmodulo, p_idgrupo );
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- editar refuerzo
+CREATE OR REPLACE FUNCTION editar_refuerzo(
+    IN p_idrefuerzo  INT,
+    IN p_explicacion TEXT,
+    IN p_puntuacion  INT,
+    IN p_idmodulo    INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    UPDATE public.refuerzo
+    SET explicacion_refuerzo = p_explicacion,
+        puntuacion_refuerzo = p_puntuacion,
+        fkidmodulo_refuerzo = p_idmodulo
+    WHERE pkid_refuerzo = p_idrefuerzo;
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Eliminar refuerzo 
+CREATE OR REPLACE FUNCTION eliminar_refuerzo(
+IN p_idrefuerzo INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    --si elimina el refuerzo elimina el enlace
+    DELETE FROM public.enlace
+    WHERE fkidrefuerzo_enlace = p_idrefuerzo;
+
+    DELETE FROM public.refuerzo
+    WHERE pkid_refuerzo = p_idrefuerzo;
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Consultar un refuerzo en especifico
+CREATE OR REPLACE FUNCTION consultar_refuerzo(
+IN p_idrefuerzo INT
+)
+RETURNS TABLE (
+    idrefuerzo   INT,
+    explicacion  TEXT,
+    puntuacion   INT,
+    idmodulo     INT,
+    nombremodulo VARCHAR
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        r.pkid_refuerzo        AS idrefuerzo,
+        r.explicacion_refuerzo AS explicacion,
+        r.puntuacion_refuerzo  AS puntuacion,
+        r.fkidmodulo_refuerzo  AS idmodulo,
+        m.nombre_modulo        AS nombremodulo
+    FROM public.refuerzo r INNER JOIN public.modulo m 
+ON m.pkid_modulo = r.fkidmodulo_refuerzo
+    WHERE r.pkid_refuerzo = p_idrefuerzo
+    ORDER BY r.pkid_refuerzo ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Consultar el listado de refuerzos de un grupo
+CREATE OR REPLACE FUNCTION consultar_refuerzos_grupo(
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idrefuerzo   INT,
+    explicacion  TEXT,
+    puntuacion   INT,
+    idmodulo     INT,
+    nombremodulo VARCHAR
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        r.pkid_refuerzo         AS idrefuerzo,
+        r.explicacion_refuerzo  AS explicacion,
+        r.puntuacion_refuerzo   AS puntuacion,
+        m.pkid_modulo           AS idmodulo,
+        m.nombre_modulo         AS nombremodulo
+    FROM public.refuerzo r INNER JOIN public.modulo m
+                ON m.pkid_modulo = r.fkidmodulo_refuerzo
+    WHERE r.fkidgrupo_refuerzo = p_idgrupo
+    ORDER BY r.pkid_refuerzo ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Crear enlace
+CREATE OR REPLACE FUNCTION crear_enlace(
+    IN p_tipo       VARCHAR,
+    IN p_contenido TEXT,
+    IN p_puntuacion INT,
+    IN p_idrefuerzo INT
+)
+RETURNS TABLE (
+    idenlace   INT,
+    tipo       VARCHAR,
+    contenido TEXT,
+    puntuacion INT
+)
+AS $$
+DECLARE
+    v_id INT := nextval('enlace_seq');
+BEGIN
+    INSERT INTO public.enlace (
+        pkid_enlace,
+        tipo_enlace,
+        contenido_enlace,
+        puntuacion_enlace,
+        fkidrefuerzo_enlace
+    ) VALUES (v_id, p_tipo::tipo_enlace, p_contenido, p_puntuacion, p_idrefuerzo);
+    RETURN QUERY 
+SELECT 
+v_id, 
+p_tipo, 
+p_contenido, 
+p_puntuacion;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Editar enlace
+--editar enlace 
+CREATE OR REPLACE FUNCTION editar_enlace(
+    IN p_idenlace   INT,
+    IN p_tipo       VARCHAR,
+    IN p_contenido TEXT,
+    IN p_puntuacion INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    UPDATE public.enlace
+    SET tipo_enlace       = p_tipo::tipo_enlace,
+        contenido_enlace = p_contenido,
+        puntuacion_enlace = p_puntuacion
+    WHERE pkid_enlace = p_idenlace;
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Eliminar enlace
+
+CREATE OR REPLACE FUNCTION eliminar_enlace(
+IN p_idenlace INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    DELETE FROM public.ingresoenlace
+    WHERE fkidenlace_ingresoenlace = p_idenlace;
+
+    DELETE FROM public.enlace
+    WHERE pkid_enlace = p_idenlace;
+    RETURN TRUE;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Conultar listado de enlaces por refuerzo 
+CREATE OR REPLACE FUNCTION consultar_enlaces_refuerzo(
+IN p_idrefuerzo INT
+)
+RETURNS TABLE (
+    idenlace   INT,
+    tipo       VARCHAR,
+    contenido  TEXT,
+    puntuacion INT
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        e.pkid_enlace          AS idenlace,
+        e.tipo_enlace::VARCHAR AS tipo,
+        e.contenido_enlace     AS contenido,
+        e.puntuacion_enlace    AS puntuacion
+    FROM public.enlace e
+    WHERE e.fkidrefuerzo_enlace = p_idrefuerzo
+    ORDER BY e.pkid_enlace;
+END;
+$$
+LANGUAGE plpgsql;
+
+--------------------------------------
+-- FUNCIONES DE JUEGOS POR PROFESOR --
+--------------------------------------
+
+
+-- Crear juego
+CREATE OR REPLACE FUNCTION crear_juego(
+    IN p_nombre      VARCHAR,
+    IN p_descripcion VARCHAR,
+    IN p_puntuacion  INT,
+    IN p_idmodulo    INT,
+    IN p_idgrupo     INT
+)
+RETURNS TABLE (
+    idjuego      INT,
+    nombrejuego  VARCHAR,
+    descripcion  VARCHAR,
+    puntuacion   INT,
+    idmodulo     INT,
+    nombremodulo VARCHAR
+)
+AS $$
+DECLARE
+    v_idjuego INT := NEXTVAL('juego_seq');
+BEGIN
+    INSERT INTO public.juego (
+        pkid_juego,
+        nombre_juego,
+        descripcion_juego,
+        puntuacion_juego,
+        fkidmodulo_juego,
+        fkidgrupo_juego
+    ) VALUES (v_idjuego, p_nombre, p_descripcion, p_puntuacion, p_idmodulo, p_idgrupo);
+    -- Asignar automáticamente al grupo creador
+    INSERT INTO public.juegoelegido (
+        pfkidjuego_juegoelegido,
+        pfkidgrupo_juegoelegido
+    ) VALUES (v_idjuego, p_idgrupo);
+    RETURN QUERY
+    SELECT
+        v_idjuego           AS idjuego,
+        p_nombre            AS nombrejuego,
+        p_descripcion       AS descripcion,
+        p_puntuacion        AS puntuacion,
+        m.pkid_modulo       AS idmodulo,
+        m.nombre_modulo     AS nombremodulo
+    FROM public.modulo m
+    WHERE m.pkid_modulo = p_idmodulo
+    ORDER BY v_idjuego ASC;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+-- Editar juego info
+CREATE OR REPLACE FUNCTION editar_juego_info(
+    IN p_idjuego     INT,
+    IN p_nombre      VARCHAR,
+    IN p_descripcion VARCHAR,
+    IN p_puntuacion  INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    UPDATE public.juego
+    SET
+        nombre_juego      = p_nombre,
+        descripcion_juego = p_descripcion,
+        puntuacion_juego  = p_puntuacion
+    WHERE pkid_juego = p_idjuego;
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Eliminar juego 
+CREATE OR REPLACE FUNCTION eliminar_juego(IN p_idjuego INT)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    -- 1. Eliminar historial de ingresos al juego
+    DELETE FROM public.ingresojuego
+    WHERE fkidjuegojuegoelegido_ingresojuego = p_idjuego;
+
+    -- 2. Eliminar todos los componentes del juego
+    DELETE FROM public.componente
+    WHERE fkidjuego_componente = p_idjuego;
+
+    -- 3. Eliminar asignaciones a grupos
+    DELETE FROM public.juegoelegido
+    WHERE pfkidjuego_juegoelegido = p_idjuego;
+
+    -- 4. Eliminar el juego
+    DELETE FROM public.juego
+    WHERE pkid_juego = p_idjuego;
 
     RETURN FOUND;
 EXCEPTION WHEN OTHERS THEN
@@ -3885,12 +4129,491 @@ END;
 $$
 LANGUAGE plpgsql;
 
---roles
---crear rol iniciador, estvbox, provbox
+
+-- Quitar el juego de un grupo específico diferente al grupo donde se creo
+CREATE OR REPLACE FUNCTION quitar_juego_grupo(
+IN p_idjuego INT, 
+IN p_idgrupo INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    DELETE FROM public.juegoelegido
+    WHERE pfkidjuego_juegoelegido = p_idjuego
+              AND pfkidgrupo_juegoelegido  = p_idgrupo;
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Añadir juego a un grupo específico
+CREATE OR REPLACE FUNCTION aniadir_juego_grupo(
+IN p_idjuego INT, 
+IN p_idgrupo INT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    -- Verificar que no esté ya asignado
+    IF EXISTS (
+        SELECT 
+            public.juegoelegido.pfkidjuego_juegoelegido,
+            public.juegoelegido.pfkidgrupo_juegoelegido
+        FROM public.juegoelegido
+        WHERE pfkidjuego_juegoelegido = p_idjuego
+            AND pfkidgrupo_juegoelegido  = p_idgrupo
+    ) THEN RETURN FALSE;
+    END IF;
+    INSERT INTO public.juegoelegido (
+        pfkidjuego_juegoelegido,
+        pfkidgrupo_juegoelegido
+    ) VALUES (p_idjuego, p_idgrupo);
+    RETURN TRUE;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- consultar juegos de un grupo específico
+CREATE OR REPLACE FUNCTION consultar_juegos_grupo_profesor(
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idjuego      INT,
+    nombrejuego  VARCHAR,
+    descripcion  VARCHAR,
+    puntuacion   INT,
+    nombremodulo VARCHAR,
+    escreador    BOOLEAN
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        j.pkid_juego            AS idjuego,
+        j.nombre_juego          AS nombrejuego,
+        j.descripcion_juego     AS descripcion,
+        j.puntuacion_juego      AS puntuacion,
+        m.nombre_modulo         AS nombremodulo,
+        (j.fkidgrupo_juego = p_idgrupo) AS escreador
+    FROM public.juegoelegido je 
+    INNER JOIN public.juego j
+        ON j.pkid_juego = je.pfkidjuego_juegoelegido
+    INNER JOIN public.modulo m
+        ON m.pkid_modulo = j.fkidmodulo_juego
+    WHERE je.pfkidgrupo_juegoelegido = p_idgrupo
+    ORDER BY escreador DESC, j.nombre_juego ASC;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Consultar los juegos de un módulo específico
+CREATE OR REPLACE FUNCTION consultar_juegos_modulo(
+IN p_idmodulo INT, 
+IN p_idgrupo INT
+)
+RETURNS TABLE (
+    idjuego     INT,
+    nombrejuego VARCHAR,
+    descripcion VARCHAR,
+    puntuacion  INT,
+    yaasignado  BOOLEAN
+)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        j.pkid_juego        AS idjuego,
+        j.nombre_juego      AS nombrejuego,
+        j.descripcion_juego AS descripcion,
+        j.puntuacion_juego  AS puntuacion,
+        EXISTS (
+            SELECT 
+je.pfkidjuego_juegoelegido,
+je.pfkidgrupo_juegoelegido
+FROM public.juegoelegido je
+            WHERE je.pfkidjuego_juegoelegido = j.pkid_juego
+                  AND je.pfkidgrupo_juegoelegido   = p_idgrupo
+        )                   AS yaasignado
+    FROM public.juego j
+    WHERE j.fkidmodulo_juego = p_idmodulo
+    ORDER BY j.nombre_juego;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Crear componente clase 
+CREATE OR REPLACE FUNCTION crear_componente_clase(
+    IN p_nombre  VARCHAR,
+    IN p_idjuego INT
+)
+RETURNS TABLE (
+    idcomponente INT,
+    nombre       VARCHAR,
+    x            FLOAT,
+    y            FLOAT
+)
+AS $$
+DECLARE
+    v_id         INT := NEXTVAL('componente_seq');
+    v_x          FLOAT := (random() * 600 + 50)::FLOAT;
+    v_y          FLOAT := (random() * 300 + 50)::FLOAT;
+    v_idtipo     INT;
+BEGIN
+    -- Buscar el tipocomponente 'Clase' del módulo al que pertenece el juego
+    SELECT 
+        tc.pkid_tipocomponente INTO v_idtipo
+    FROM public.tipocomponente tc 
+    INNER JOIN public.juego j 
+        ON tc.fkidmodulo_tipocomponente = j.fkidmodulo_juego
+    WHERE
+        j.pkid_juego = p_idjuego
+        AND tc.nombre_tipocomponente = 'Clase'
+    LIMIT 1;
+
+    INSERT INTO public.componente (
+        pkid_componente,
+        nombre_componente,
+        extra_componente,
+        componentepadre_componente,
+        retroalimentacion_componente,
+        fkidtipocomponente_componente,
+        fkidjuego_componente
+    ) VALUES (v_id, p_nombre, json_build_object('x', v_x, 'y', v_y), NULL, NULL, v_idtipo, p_idjuego );
+
+    RETURN QUERY 
+        SELECT
+        v_id, 
+        p_nombre, 
+        v_x, 
+        v_y;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Crear componente atributo
+CREATE OR REPLACE FUNCTION crear_componente_atributo(
+    IN p_nombre            VARCHAR,
+    IN p_visibilidad       VARCHAR,
+    IN p_tipo              VARCHAR,
+    IN p_idclase           INT,
+    IN p_retroalimentacion TEXT,
+    IN p_idjuego           INT
+)
+RETURNS TABLE (
+    idcomponente  INT,
+    nombre        VARCHAR,
+    visibilidad   VARCHAR,
+    tipo          VARCHAR,
+    idclase       INT
+)
+AS $$
+DECLARE
+    v_id     INT := nextval('componente_seq');
+    v_idtipo INT;
+BEGIN
+    SELECT 
+        tc.pkid_tipocomponente INTO v_idtipo
+    FROM public.tipocomponente tc 
+    INNER JOIN public.juego j 
+        ON tc.fkidmodulo_tipocomponente = j.fkidmodulo_juego
+    WHERE j.pkid_juego = p_idjuego
+          AND tc.nombre_tipocomponente = 'Atributo'
+    LIMIT 1;
+
+    INSERT INTO public.componente (
+        pkid_componente,
+        nombre_componente,
+        extra_componente,
+        componentepadre_componente,
+        retroalimentacion_componente,
+        fkidtipocomponente_componente,
+        fkidjuego_componente
+    ) VALUES (v_id, p_nombre, json_build_object('visibilidad', p_visibilidad, 'tipo', p_tipo), p_idclase, p_retroalimentacion, v_idtipo, p_idjuego);
+
+    RETURN QUERY 
+        SELECT 
+        v_id, 
+        p_nombre, 
+        p_visibilidad, 
+        p_tipo, 
+        p_idclase;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Crear componetne metodo
+CREATE OR REPLACE FUNCTION crear_componente_metodo(
+    IN p_nombre            VARCHAR,
+    IN p_visibilidad       VARCHAR,
+    IN p_tipo              VARCHAR,
+    IN p_idclase           INT,
+    IN p_retroalimentacion TEXT,
+    IN p_idjuego           INT
+)
+RETURNS TABLE (
+    idcomponente  INT,
+    nombre        VARCHAR,
+    visibilidad   VARCHAR,
+    tipo          VARCHAR,
+    idclase       INT
+)
+AS $$
+DECLARE
+    v_id     INT := nextval('componente_seq');
+    v_idtipo INT;
+BEGIN
+    SELECT 
+        tc.pkid_tipocomponente INTO v_idtipo
+    FROM public.tipocomponente tc 
+    INNER JOIN public.juego j 
+        ON tc.fkidmodulo_tipocomponente = j.fkidmodulo_juego
+    WHERE j.pkid_juego = p_idjuego AND tc.nombre_tipocomponente = 'Metodo'
+    LIMIT 1;
+
+    INSERT INTO public.componente (
+        pkid_componente,
+        nombre_componente,
+        extra_componente,
+        componentepadre_componente,
+        retroalimentacion_componente,
+        fkidtipocomponente_componente,
+        fkidjuego_componente
+    ) VALUES (v_id, p_nombre, json_build_object('visibilidad', p_visibilidad, 'tipo', p_tipo), p_idclase, p_retroalimentacion, v_idtipo, p_idjuego);
+
+    RETURN QUERY 
+        SELECT 
+        v_id,
+        p_nombre,
+        p_visibilidad,
+        p_tipo,
+        p_idclase;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Crear componete relacion
+CREATE OR REPLACE FUNCTION crear_componente_relacion(
+    IN p_tipo_relacion     VARCHAR,
+    IN p_idclase_origen    INT,
+    IN p_idclase_destino   INT,
+    IN p_retroalimentacion TEXT,
+    IN p_idjuego           INT
+)
+RETURNS TABLE (
+    idcomponente      INT,
+    tipo_relacion     VARCHAR,
+    idclase_origen    INT,
+    idclase_destino   INT,
+    retroalimentacion TEXT
+)
+AS $$
+DECLARE
+    v_id     INT := nextval('componente_seq');
+    v_idtipo INT;
+BEGIN
+    SELECT 
+tc.pkid_tipocomponente INTO v_idtipo
+    FROM public.tipocomponente tc INNER JOIN public.juego j 
+ON tc.fkidmodulo_tipocomponente = j.fkidmodulo_juego
+    WHERE j.pkid_juego = p_idjuego
+              AND tc.nombre_tipocomponente = 'Relacion'
+    LIMIT 1;
+    INSERT INTO public.componente (
+        pkid_componente,
+        nombre_componente,
+        extra_componente,
+        componentepadre_componente,
+        retroalimentacion_componente,
+        fkidtipocomponente_componente,
+        fkidjuego_componente
+    ) VALUES (v_id, NULL,
+        json_build_object(
+            'claseOrigen',  p_idclase_origen,
+            'claseDestino', p_idclase_destino,
+            'tipo',         p_tipo_relacion
+        ), NULL, p_retroalimentacion, v_idtipo, p_idjuego);
+    RETURN QUERY 
+SELECT 
+v_id,
+p_tipo_relacion, 
+p_idclase_origen, 
+p_idclase_destino, 
+p_retroalimentacion;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Eliminar componente
+CREATE OR REPLACE FUNCTION eliminar_componente(
+IN p_idcomponente INT
+)
+RETURNS BOOLEAN
+AS $$
+DECLARE
+    v_tipo VARCHAR;
+BEGIN
+    -- Obtener el tipo del componente
+    SELECT 
+tc.nombre_tipocomponente INTO v_tipo
+    FROM public.componente c INNER JOIN public.tipocomponente tc
+ON tc.pkid_tipocomponente = c.fkidtipocomponente_componente
+    WHERE c.pkid_componente = p_idcomponente;
+    IF NOT FOUND THEN
+        RETURN FALSE;
+    END IF;
+    IF v_tipo = 'Clase' THEN
+        -- Eliminar relaciones que involucren esta clase
+        DELETE FROM public.componente
+        WHERE fkidtipocomponente_componente IN (
+            SELECT pkid_tipocomponente
+            FROM public.tipocomponente
+            WHERE nombre_tipocomponente = 'Relacion'
+        )
+        AND (
+            (extra_componente->>'claseOrigen')::INT  = p_idcomponente
+            OR
+            (extra_componente->>'claseDestino')::INT = p_idcomponente
+        );
+        -- Eliminar atributos y métodos hijos
+        DELETE FROM public.componente
+        WHERE componentepadre_componente = p_idcomponente;
+    END IF;
+    -- Eliminar el componente en sí
+    DELETE FROM public.componente
+    WHERE pkid_componente = p_idcomponente;
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-- Actualizar posición componente clase
+
+CREATE OR REPLACE FUNCTION actualizar_posicion_clase(
+    IN p_idcomponente INT,
+    IN p_x            FLOAT,
+    IN p_y            FLOAT
+)
+RETURNS BOOLEAN
+AS $$
+BEGIN
+    UPDATE public.componente
+    SET extra_componente = json_build_object('x', p_x, 'y', p_y)
+    WHERE pkid_componente = p_idcomponente;
+    RETURN FOUND;
+EXCEPTION WHEN OTHERS THEN
+    RETURN FALSE;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+-------------------------------------------------------------------
+--                          SECUENCIAS                           --
+-------------------------------------------------------------------
+
+
+CREATE SEQUENCE IF NOT EXISTS ingresojuego_seq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9900
+    CACHE 1
+    NO CYCLE;
+
+
+
+-- Secuencia para módulos
+CREATE SEQUENCE IF NOT EXISTS modulo_seq
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 9900
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para teorias
+CREATE SEQUENCE IF NOT EXISTS teoria_seq
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 9900
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para actividades
+CREATE SEQUENCE IF NOT EXISTS actividad_seq
+  START WITH 1
+  INCREMENT BY 1
+  MAXVALUE 9900
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para grupos
+CREATE SEQUENCE IF NOT EXISTS grupo_seq
+  START WITH 1000
+  INCREMENT BY 1
+  MAXVALUE 99000
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para refuerzos
+CREATE SEQUENCE IF NOT EXISTS refuerzo_seq
+  START WITH 1
+  INCREMENT BY 1
+  NO MAXVALUE
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para enlaces
+CREATE SEQUENCE IF NOT EXISTS enlace_seq
+  START WITH 100
+  INCREMENT BY 1
+  NO MAXVALUE
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para juegos
+CREATE SEQUENCE IF NOT EXISTS juego_seq
+  START WITH 100
+  INCREMENT BY 1
+  NO MAXVALUE
+  CACHE 1
+  NO CYCLE;
+
+
+-- Secuencia para componentes
+CREATE SEQUENCE IF NOT EXISTS componente_seq
+  START WITH 100
+  INCREMENT BY 1
+  NO MAXVALUE
+  CACHE 1
+  NO CYCLE;
+
+-------------------------------------------------------------------
+--                          ROLES.                               --
+-------------------------------------------------------------------
+
+
+--crear rol iniciador, estvbox, provbox y adminvbox
 CREATE ROLE iniciador NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT;
 CREATE ROLE estvbox NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT;
 CREATE ROLE provbox NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT;
 CREATE ROLE adminvbox NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT;
+
 
 --usar grant para los esquemas
 GRANT USAGE ON SCHEMA public TO iniciador;
@@ -3898,8 +4621,17 @@ GRANT USAGE ON SCHEMA public TO estvbox;
 GRANT USAGE ON SCHEMA public TO provbox;
 GRANT USAGE ON SCHEMA public to adminvbox;
 
+GRANT USAGE ON SCHEMA auditoria TO estvbox;
+GRANT USAGE ON SCHEMA auditoria TO provbox;
+GRANT USAGE ON SCHEMA auditoria to adminvbox;
+
+
+
 --crear usuarios
 CREATE USER visitante WITH PASSWORD '1234';
+
+
+--asignar permisos
 GRANT iniciador TO visitante;
 GRANT estvbox TO visitante;
 GRANT provbox TO visitante;
@@ -3910,80 +4642,159 @@ GRANT INSERT ON TABLE public.perfil TO iniciador;
 GRANT SELECT ON TABLE public.perfil, public.universidad, public.programa TO iniciador;
 
 --acceso a tablas estvbox
+GRANT INSERT ON TABLE
+	auditoria.aud_actividad,
+	auditoria.aud_universidad, 
+    auditoria.aud_programa, 
+    auditoria.aud_cursoimpartido, 
+    auditoria.aud_curso,
+    auditoria.aud_certificado, 
+    auditoria.aud_grupo, 
+    auditoria.aud_refuerzo, 
+    auditoria.aud_enlace, 
+    auditoria.aud_modulo, 
+    auditoria.aud_teoria, 
+    auditoria.aud_actividad, 
+    auditoria.aud_participacion, 
+    auditoria.aud_participacion,
+    auditoria.aud_perfil,
+    auditoria.aud_juego,
+    auditoria.aud_juegoelegido,
+    auditoria.aud_ingresojuego,
+    auditoria.aud_ingresoenlace,
+    auditoria.aud_ingresorefuerzo,
+    auditoria.aud_tipocomponente,
+    auditoria.aud_componente
+to estvbox;
+
+
 GRANT SELECT ON TABLE
-	public.universidad, 
-	public.programa, 
-	public.cursoimpartido, 
-	public.curso, 
-	public.grupo, 
-	public.refuerzo, 
-	public.enlace, 
-	public.modulo, 
-	public.teoria, 
-	public.actividad, 
-	public.juego,
-	public.tipocomponente,
-	public.componente
+    public.universidad, 
+    public.programa, 
+    public.cursoimpartido, 
+    public.curso, 
+    public.grupo, 
+    public.refuerzo, 
+    public.enlace, 
+    public.modulo, 
+    public.teoria, 
+    public.actividad, 
+    public.juego,
+    public.tipocomponente,
+    public.componente
 TO estvbox;
 
 GRANT INSERT, SELECT ON TABLE
-	public.certificado,
-	public.ingresorefuerzo,
-	public.ingresoenlace,
-	public.ingresojuego
+    public.certificado,
+    public.ingresorefuerzo,
+    public.ingresoenlace,
+    public.ingresojuego
 TO estvbox;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-	public.perfil,
-	public.participacion
+    public.perfil,
+    public.participacion
 TO estvbox;
 
 --acceso a tablas provbox
-GRANTE SELECT ON TABLE
-	public.universidad,
-	public.programa,
-	public.curso,
-	public.ingresorefuerzo,
-	public.ingresoenlace,
-	public.modulo,
-	public.teoria,
-	public.actividad,
-	public.ingresojuego,
-	public.tipocomponente
+GRANT INSERT ON TABLE
+	auditoria.aud_actividad,
+	auditoria.aud_universidad, 
+    auditoria.aud_programa, 
+    auditoria.aud_cursoimpartido, 
+    auditoria.aud_curso,
+    auditoria.aud_certificado, 
+    auditoria.aud_grupo, 
+    auditoria.aud_refuerzo, 
+    auditoria.aud_enlace, 
+    auditoria.aud_modulo, 
+    auditoria.aud_teoria, 
+    auditoria.aud_actividad, 
+    auditoria.aud_participacion, 
+    auditoria.aud_participacion,
+    auditoria.aud_perfil,
+    auditoria.aud_juego,
+    auditoria.aud_juegoelegido,
+    auditoria.aud_ingresojuego,
+    auditoria.aud_ingresoenlace,
+    auditoria.aud_ingresorefuerzo,
+    auditoria.aud_tipocomponente,
+    auditoria.aud_componente
+to provbox;
+
+
+GRANT SELECT ON TABLE
+    public.universidad,
+    public.programa,
+    public.curso,
+    public.ingresorefuerzo,
+    public.ingresoenlace,
+    public.modulo,
+    public.teoria,
+    public.actividad,
+    public.ingresojuego,
+    public.tipocomponente
 TO provbox;
 
-GRANTE SELECT, INSERT, UPDATE, DELETE ON TABLE
-	public.cursoimpartido,
-	public.perfil,
-	public.grupo,
-	public.participacion,
-	public.refuerzo,
-	public.enlace,
-	public.juego,
-	public.juegoelegido,
-	public.componente
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
+    public.cursoimpartido,
+    public.perfil,
+    public.grupo,
+    public.participacion,
+    public.refuerzo,
+    public.enlace,
+    public.juego,
+    public.juegoelegido,
+    public.ingresoenlace,
+    public.componente
 TO provbox;
 
 --acceso a tablas adminvbox
+GRANT INSERT ON TABLE
+	auditoria.aud_actividad,
+	auditoria.aud_universidad, 
+    auditoria.aud_programa, 
+    auditoria.aud_cursoimpartido, 
+    auditoria.aud_curso,
+    auditoria.aud_certificado, 
+    auditoria.aud_grupo, 
+    auditoria.aud_refuerzo, 
+    auditoria.aud_enlace, 
+    auditoria.aud_modulo, 
+    auditoria.aud_teoria, 
+    auditoria.aud_actividad, 
+    auditoria.aud_participacion, 
+    auditoria.aud_participacion,
+    auditoria.aud_perfil,
+    auditoria.aud_juego,
+    auditoria.aud_juegoelegido,
+    auditoria.aud_ingresojuego,
+    auditoria.aud_ingresoenlace,
+    auditoria.aud_ingresorefuerzo,
+    auditoria.aud_tipocomponente,
+    auditoria.aud_componente
+to adminvbox;
+
+
 GRANT SELECT ON TABLE
-	public.universidad,
-	public.programa,
-	public.participacion,
-	public.certificado,
-	public.refuerzo,
-	public.enlace,
-	public.ingresorefuerzo,
-	public.ingresoenlace,
-	public.ingresojuego,
-	public.tipocomponente,
-	public.componente,
-	public.cursoimpartido
+    public.universidad,
+    public.programa,
+    public.participacion,
+    public.certificado,
+    public.refuerzo,
+    public.enlace,
+    public.ingresorefuerzo,
+    public.ingresoenlace,
+    public.ingresojuego,
+    public.tipocomponente,
+    public.componente,
+    public.cursoimpartido
+TO adminvbox;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
+    public.perfil,
+    public.curso,
+    public.modulo,
+    public.teoria,
+    public.actividad
 TO adminvbox;
 
-GRANTE SELECT, INSERT, UPDATE, DELETE ON TABLE
-	public.perfil,
-	public.curso,
-	public.modulo,
-	public.teoria,
-	public.actividad
-TO adminbox;
