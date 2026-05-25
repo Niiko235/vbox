@@ -24,10 +24,10 @@ import {
 } from '@/components/ui/field'
 
 import type { JuegoGrupoProfesor } from '../actions/get-juegos-grupo-profesor'
-import { editarJuegoMetadata } from '../actions/editar-juego-metadata'
+import { editarJuegoInfo } from '../actions/editar_juego_info'
 
 const schema = z.object({
-  nombre:      z.string().min(1),
+  nombre:      z.string().min(1).max(20, 'El nombre no puede tener más de 20 caracteres'),
   descripcion: z.string().min(1),
   puntuacion:  z.string().min(1),
 })
@@ -69,7 +69,7 @@ export function DialogEditarJuego({ juego, onJuegoEditado }: Props) {
     setErrorMsg(null)
     setSubmitting(true)
     try {
-      const result = await editarJuegoMetadata({
+      const result = await editarJuegoInfo({
         idjuego:     juego.idjuego,
         nombre:      values.nombre,
         descripcion: values.descripcion,

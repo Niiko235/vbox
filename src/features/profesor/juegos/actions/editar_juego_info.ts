@@ -14,15 +14,17 @@ type EditarJuegoMetadataResponse = {
   message?: string
 }
 
-export async function editarJuegoMetadata(
+export async function editarJuegoInfo(
   input: EditarJuegoMetadataInput
 ): Promise<EditarJuegoMetadataResponse> {
   try {
-    const { rows } = await db.query<{ editar_juego_metadata: boolean }>(
-      'SELECT editar_juego_metadata($1, $2, $3, $4)',
+
+    console.log('Editar juego info input:', input.puntuacion) // Agrega este log para verificar los datos de entrada
+    const { rows } = await db.query<{ editar_juego_info: boolean }>(
+      'SELECT editar_juego_info($1, $2, $3, $4)',
       [input.idjuego, input.nombre, input.descripcion, input.puntuacion]
     )
-    return { ok: rows[0].editar_juego_metadata }
+    return { ok: rows[0].editar_juego_info }
   } catch (error) {
     return {
       ok: false,

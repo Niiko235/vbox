@@ -25,7 +25,7 @@ import type { Modulo } from '@/features/profesor/refuerzos/actions/get-modulos'
 import type { JuegoModulo } from '../actions/get-juegos-modulo'
 import type { JuegoGrupoProfesor } from '../actions/get-juegos-grupo-profesor'
 import { getJuegosModulo } from '../actions/get-juegos-modulo'
-import { añadirJuegoGrupo } from '../actions/añadir-juego-grupo'
+import { aniadirJuegoGrupo } from '../actions/aniadir-juego-grupo'
 
 type Props = {
   idgrupo: number
@@ -33,7 +33,7 @@ type Props = {
   onJuegoAñadido: (juego: JuegoGrupoProfesor) => void
 }
 
-export function DialogAñadirJuego({ idgrupo, modulos, onJuegoAñadido }: Props) {
+export function DialogAniadirJuego({ idgrupo, modulos, onJuegoAñadido }: Props) {
   const [isOpen, setIsOpen]             = useState(false)
   const [moduloId, setModuloId]         = useState<string>('')
   const [juegos, setJuegos]             = useState<JuegoModulo[]>([])
@@ -66,7 +66,10 @@ export function DialogAñadirJuego({ idgrupo, modulos, onJuegoAñadido }: Props)
   async function handleAñadir(juego: JuegoModulo) {
     setAdding((prev) => new Set(prev).add(juego.idjuego))
     try {
-      const result = await añadirJuegoGrupo(juego.idjuego, idgrupo)
+
+      console.log('ANADIENDO UN JUEGO')
+      console.log(juego.idjuego, idgrupo)
+      const result = await aniadirJuegoGrupo(juego.idjuego, idgrupo)
 
       if (!result.ok) {
         toast.error('No se pudo añadir el juego')

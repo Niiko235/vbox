@@ -35,10 +35,10 @@ import type { JuegoGrupoProfesor } from '../actions/get-juegos-grupo-profesor'
 import { crearJuego } from '../actions/crear-juego'
 
 const schema = z.object({
-  nombre:      z.string().min(1),
-  descripcion: z.string().min(1),
-  puntuacion:  z.string().min(1),
-  idmodulo:    z.string().min(1),
+  nombre:      z.string().min(1, 'El nombre es requerido').max(20, 'El nombre no puede tener más de 20 caracteres'),
+  descripcion: z.string().min(1, 'La descripción es requerida'),
+  puntuacion:  z.string().min(1, 'La puntuación es requerida'),
+  idmodulo:    z.string().min(1, 'Debe seleccionar un módulo'),
 })
 
 type FormValues = z.infer<typeof schema>

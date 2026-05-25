@@ -7,11 +7,11 @@ export const rutesTeacher = [
     url: '/home/cursos',
     icon: BookOpenText,
   },
-  {
-    title: 'Estadísticas',
-    url: '/home/estadisticas',
-    icon: ChartLine,
-  },
+  // {
+  //   title: 'Estadísticas',
+  //   url: '/home/estadisticas',
+  //   icon: ChartLine,
+  // },
   {
     title: 'Perfil',
     url: '/home/perfil',
@@ -30,11 +30,11 @@ export const rutesAdmin = [
     url: '/inicio/cursos',
     icon: BookOpenText,
   },
-  {
-    title: 'Estadísticas',
-    url: '/inicio/estadisticas',
-    icon: ChartLine,
-  },
+  // {
+  //   title: 'Estadísticas',
+  //   url: '/inicio/estadisticas',
+  //   icon: ChartLine,
+  // },
   {
     title: 'Perfil',
     url: '/inicio/perfil',

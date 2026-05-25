@@ -19,7 +19,7 @@ import type { Modulo } from '@/features/profesor/refuerzos/actions/get-modulos'
 import type { JuegoGrupoProfesor } from '../actions/get-juegos-grupo-profesor'
 import { DialogCrearJuego }           from './dialog-crear-juego'
 import { DialogEditarJuego }          from './dialog-editar-juego'
-import { DialogAñadirJuego }          from './dialog-añadir-juego'
+import { DialogAniadirJuego }          from './dialog-aniadir-juego'
 import { AlertDialogDeleteJuego }     from './alert-dialog-delete-juego'
 import { AlertDialogQuitarJuego }     from './alert-dialog-quitar-juego'
 
@@ -49,7 +49,7 @@ export function TableJuegosProfesor({
 
   const botonesCrear = (
     <div className="flex justify-end gap-2">
-      <DialogAñadirJuego
+      <DialogAniadirJuego
         idgrupo={idgrupo}
         modulos={modulos}
         onJuegoAñadido={handleAñadido}
@@ -144,10 +144,10 @@ export function TableJuegosProfesor({
                           onJuegoEditado={handleEditado}
                         />
                         {/* Eliminar */}
-                        <AlertDialogDeleteJuego
+                        {/* <AlertDialogDeleteJuego
                           idjuego={juego.idjuego}
                           onEliminar={handleEliminado}
-                        />
+                        /> */}
                       </>
                     ) : (
                       /* Quitar del grupo */
